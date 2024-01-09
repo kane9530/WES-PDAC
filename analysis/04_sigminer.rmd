@@ -1,0 +1,93 @@
+---
+title: "sigminer"
+output: html_document
+date: "2023-06-23"
+---
+
+```{r setup, include=FALSE}
+library(sigminer)
+library(NMF)
+```
+
+```{r}
+# Read in the merged maf file from 02_maftools_analyses.rmd
+maf_filepath = "results_wes_full_40samples/combined/maf/merged_mafs/merged_mafs_230623_maftools.maf"
+maf <- read_maf(maf_filepath)
+
+# Creating the patient and sample column for better annotation
+maf@clinical.data <- maf@clinical.data %>%
+  tidyr::separate(Tumor_Sample_Barcode, into = c("Patient", "Sample", "Treatment"), sep = "_", remove=FALSE) %>%
+  dplyr::mutate(Sample_Label = stringr::str_extract(Sample, "[A-Za-z]+")) %>%
+  data.table::setDT()
+```
+
+Tally components
+```{r}
+mt_tally <- sig_tally(
+  maf,
+  ref_genome = "BSgenome.Hsapiens.UCSC.hg38",
+  useSyn = TRUE)
+```
+
+Extract signature:
+
+Method 1: Estimate signature number
+
+```{r}
+mt_est <- sig_estimate(mt_tally$nmf_matrix,
+                       range=2:6,
+                       nrun = 10,
+                       method = "brunet",
+                       use_random=FALSE,
+                       cores=32,
+                       verbose=TRUE)
+
+show_sig_number_survey(mt_est$survey, right_y = NULL)
+show_sig_number_survey2(mt_est$survey)
+```
+
+Next, Extract signatures
+
+Manual:
+
+```{r}
+mt_sig <- sig_extract(mt_tally$nmf_matrix,
+  n_sig = 5,
+  nrun = 30,
+  cores = 4,
+  pConstant = 1e-13
+
+```
+
+Automatic:
+
+```{r}
+mt_sig2 <- sig_auto_extract(mt_tally$nmf_matrix,
+  K0 = 10, nrun = 10,
+  strategy = "stable"
+)
+
+mt_sig2
+```
+Match signatures
+
+```{r}
+sim <- get_sig_similarity(mt_sig2, sig_db = "SBS")
+```
+```{r}
+pheatmap::pheatmap(sim$similarity)
+
+```
+
+```{r}
+show_sig_profile(mt_sig2, mode = "SBS", paint_axis_text = FALSE, x_label_angle = 90)
+
+```
+
+```{r}
+show_sig_profile(mt_sig2, mode = "SBS", style = "cosmic", x_label_angle = 90)
+BiocManager::install("PureCN")
+
+```
+
+

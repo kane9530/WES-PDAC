@@ -1,0 +1,19 @@
+---
+title: "05_hrd"
+output: ''
+date: "2023-06-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#devtools::install_github('sztup/scarHRD',build_vignettes = TRUE)
+#devtools::install_github('aroneklund/copynumber')
+#devtools::install_bitbucket('sequenzatools/sequenza')
+
+library(scarHRD)
+library(copynumber)
+```
+

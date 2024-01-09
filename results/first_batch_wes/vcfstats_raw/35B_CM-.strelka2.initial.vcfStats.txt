@@ -1,0 +1,7 @@
+35B_CM-     115 HighDPFRatio
+35B_CM-      93 HighSNVSB
+35B_CM-     224 LowDepth
+35B_CM-    2029 LowGQX
+35B_CM-    2297 NoPassedVariantGTs
+35B_CM-   26635 PASS
+35B_CM-       9 SiteConflict

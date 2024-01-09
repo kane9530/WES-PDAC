@@ -1,0 +1,31 @@
+---
+title: "run_ascat"
+output: html_document
+date: "2023-09-19"
+---
+```{r}
+library(ASCAT)
+library(stringr)
+```
+
+```{r}
+path_to_cram <-  list.files("./results_wes_full_40samples_pad50bp/preprocessing/recalibrated"
+, full.names=TRUE, recursive=TRUE)
+group_identifiers <- str_extract(path_to_cram, "(?<=/)[^/]+(?=/(?:[^/]+)$)")
+grouped_files <- split(path_to_cram, group_identifiers)
+grouped_files$`113B_CM-`
+```
+
+```{r}
+ascat.prepareHTS(grouped_files$`128RT_TISSUE`[1], grouped_files$`128RT_PBMC`[1],
+                 tumourname="128RT_tumor", normalname="128RT_normal",
+                 nthreads=16,
+                 genomeVersion="hg38",
+                 gender="XY",
+        BED_file="hg38_exome_v2.0.2_targets_sorted_validated.re_annotated.sorted.pad50bp.bed",
+        alleles.prefix="/media/gedac/kane/projects/booney_wes/prep_ascat/1000G_loci_hg38/battenberg_alleles_on_target_hg38/battenberg_alleles_on_target_hg38.zip",
+        loci.prefix="/media/gedac/kane/projects/booney_wes/prep_ascat/1000G_loci_hg38/battenberg_loci_on_target_hg38/battenberg_loci_on_target_hg38.zip")
+
+```
+
+

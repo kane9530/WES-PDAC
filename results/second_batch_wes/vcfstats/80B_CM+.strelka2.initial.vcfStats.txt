@@ -1,0 +1,7 @@
+80B_CM+     145 HighDPFRatio
+80B_CM+      71 HighSNVSB
+80B_CM+     214 LowDepth
+80B_CM+    1993 LowGQX
+80B_CM+    2239 NoPassedVariantGTs
+80B_CM+   27989 PASS
+80B_CM+      12 SiteConflict

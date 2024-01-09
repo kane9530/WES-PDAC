@@ -1,0 +1,51 @@
+---
+title: "GISTIC"
+output: html_document
+date: "2023-09-11"
+---
+
+GISTIC
+
+```{r}
+getwd()
+all.lesions = "./gistic/gistic_booney_out_99/all_lesions.conf_99.txt"
+amp.genes = "./gistic/gistic_booney_out_99/amp_genes.conf_99.txt"
+del.genes = "./gistic/gistic_booney_out_99/del_genes.conf_99.txt"
+scores.gis = "./gistic/gistic_booney_out_99/scores.gistic"
+
+gistic_files = readGistic(gisticAllLesionsFile = all.lesions, gisticAmpGenesFile = amp.genes, gisticDelGenesFile = del.genes, gisticScoresFile = scores.gis, isTCGA = FALSE)
+gisticChromPlot(gistic = gistic_files, markBands = "all", fdrCutOff=0.05, ref.build = "hg38", )
+gisticBubblePlot(gistic = gistic_files, fdrCutOff=0.05)
+```
+
+```{r}
+patient_colors = RColorBrewer::brewer.pal(n = length(unique(merged_maf@clinical.data$Patient)),name = 'Spectral')
+names(patient_colors) = unique(merged_maf@clinical.data$Patient)
+
+treatment_colors = RColorBrewer::brewer.pal(n = length(unique(merged_maf@clinical.data$Treatment)),name = 'Accent')
+names(treatment_colors) = unique(merged_maf@clinical.data$Treatment)
+treatment_colors
+
+sample_label_colors = c("#F22B6E", "#82BAB9")
+names(sample_label_colors) = unique(merged_maf@clinical.data$Sample_Label)
+
+anno_colors = list("Patient" = patient_colors,
+  "Treatment" = treatment_colors,
+  "Sample_Label" = sample_label_colors)
+
+png(paste0(res_path,"/gistic_oncoplot.png"), units = "in", res = 300, width = 15, height = 20)
+gisticOncoPlot(gistic = gistic_files, clinicalData = getClinicalData(x = merged_maf), clinicalFeatures=c("Patient","Treatment","Sample_Label"), showTumorSampleBarcodes=TRUE, barcode_mar=10, gene_mar=10, annotationColor=anno_colors)
+
+dev.off()
+getClinicalData(x = merged_maf)
+
+gisticOncoPlot(gistic = gistic_files)
+
+unique(getClinicalData(x = merged_maf)$Treatment)
+unique(getClinicalData(x = merged_maf)$Treatment)
+
+gistic_files
+
+```
+
+

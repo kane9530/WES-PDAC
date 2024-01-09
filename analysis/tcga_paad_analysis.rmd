@@ -1,0 +1,164 @@
+---
+title: "tcga_analysis"
+output: html_document
+date: "2023-09-21"
+---
+
+```{r}
+library(TCGAbiolinks)
+library(UpSetR)
+
+res_path <-"r_analysis_pad50bp/tcga/"
+```
+
+# TCGA 
+
+## Downloading the TCGA files
+
+```{r}
+query_tcga <- GDCquery(
+  project = "TCGA-PAAD", 
+  data.type="Masked Somatic Mutation",
+  data.category = "Simple Nucleotide Variation",
+  data.format="MAF"
+)
+
+download_dir <- "tcga_paad_files"
+GDCdownload(query_tcga, method = "api", directory = download_dir)
+```
+
+## Creating a merged maf file
+
+```{r}
+file_list <- list.files("/media/gedac/kane/projects/booney_wes/tcga_paad_files/",
+                            full.names=TRUE, recursive=TRUE, pattern = "masked.maf.gz$")
+maf_list = lapply(file_list, data.table::fread, sep="\t", skip = "Hugo_Symbol")
+x = data.table::rbindlist(l = maf_list, use.names = TRUE, fill = TRUE)
+tcga_paad_maf = maftools::read.maf(maf = x)
+
+# Outlier sample has 12,766 variants!
+remove_outlier_sample <- tcga_paad_maf@clinical.data$Tumor_Sample_Barcode[tcga_paad_maf@clinical.data$Tumor_Sample_Barcode !=  "TCGA-IB-7651-01A-11D-2154-08"]
+tcga_paad_maf <- subsetMaf(tcga_paad_maf, tsb=remove_outlier_sample)
+```
+
+# Alternatively, just use maftools! We will use this dataset.
+
+```{r}
+maftools_pdac = tcgaLoad(study = "PAAD")
+(maftools_pdac@variants.per.sample)
+tmb(maftools_pdac, logScale=FALSE)
+# Outlier sample has 14,176 variants!
+remove_outlier_sample <- maftools_pdac@clinical.data$Tumor_Sample_Barcode[maftools_pdac@clinical.data$Tumor_Sample_Barcode !=  "TCGA-IB-7651-01A-11D-2154-08"]
+maftools_pdac <- subsetMaf(maftools_pdac, tsb=remove_outlier_sample)
+```
+## TCGA oncoplot
+```{r}
+png(paste0(res_path,"tcga_oncoplot_top20.png"), units = "in", res = 300, width = 12, height = 12)
+oncoplot(maf = maftools_pdac, titleText = "", top = 20)
+dev.off()
+```
+
+```{r}
+data(cgc_67, package = "COSMIC.67")
+cosmic_genes_tcga <- getGeneSummary(maftools_pdac)$Hugo_Symbol[getGeneSummary(maftools_pdac)$Hugo_Symbol %in% cgc_67$SYMBOL]
+
+png(paste0(res_path,"tcga_cosmic_oncoplot.png"), units = "in", res = 300, width = 12, height = 14)
+oncoplot(maf = maftools_pdac, genes=cosmic_genes_tcga,
+         fontSize=0.4)
+dev.off()
+```
+
+## TMB plot
+
+See tcgacompare below for direct comparison
+```{r}
+tmb(maftools_pdac, logScale=FALSE)
+```
+
+# PDAC data
+```{r}
+merged_maf <- read.maf("merged_mafs_intersect_noPCA117_210923_maftools.maf", 
+                 verbose=TRUE)
+merged_maf@clinical.data <- merged_maf@clinical.data %>%
+  tidyr::separate(Tumor_Sample_Barcode, into = c("Patient", "Sample", "Treatment"), sep = "_", remove=FALSE) %>%
+  dplyr::mutate(Sample_Label = stringr::str_extract(Sample, "[A-Za-z]+")) %>%
+  data.table::setDT()
+
+tissue_samples <- merged_maf@clinical.data$Tumor_Sample_Barcode[grep(merged_maf@clinical.data$Tumor_Sample_Barcode, pattern="*TISSUE$")]
+merged_maf_tissue_only <- subsetMaf(merged_maf, tsb= tissue_samples)
+```
+
+# PDAC data vs TCGA_PAAD
+
+## Compare mutated genes
+
+All genes: Around 38% of all genes shared.
+
+```{r}
+getGeneSummary(merged_maf)
+merged_maf
+pdac_genes <- getGeneSummary(merged_maf)$Hugo_Symbol
+tcga_genes <- getGeneSummary(maftools_pdac)$Hugo_Symbol
+
+list_of_genes_all <- list(TCGA_PAAD = tcga_genes, PDO_TISSUE = pdac_genes)
+
+# Generate UpSet plot
+upset_all_genes <- upset(fromList(list_of_genes_all), order.by = "degree")
+shared_all_genes <- intersect(tcga_genes, pdac_genes)
+233/(233+387)
+
+png(paste0(res_path,"upset_allGenes.png"), units = "in", res = 300, width = 15, height = 12)
+upset_all_genes
+dev.off()
+```
+Comparing just COSMIC genes. 
+Around 15/26=57% of genes are shared.
+
+```{r}
+# Comparing mutations in PDAC samples vs TCGA
+cosmic_genes<- getGeneSummary(merged_maf)$Hugo_Symbol[getGeneSummary(merged_maf)$Hugo_Symbol %in% cgc_67$SYMBOL]
+cosmic_genes_tcga <- getGeneSummary(maftools_pdac)$Hugo_Symbol[getGeneSummary(maftools_pdac)$Hugo_Symbol %in% cgc_67$SYMBOL]
+# Create a list of gene sets
+list_of_genes <- list(TCGA_PAAD = cosmic_genes_tcga, PDO_TISSUE = cosmic_genes)
+
+# Generate UpSet plot
+upset_cosmic_genes <- upset(fromList(list_of_genes), order.by = "degree")
+
+shared_cosmic_genes <- intersect(cosmic_genes, cosmic_genes_tcga)
+15/26
+
+png(paste0(res_path,"upset_cosmic_genes.png"), units = "in", res = 300, width = 15, height = 12)
+upset_cosmic_genes
+dev.off()
+```
+
+
+## Co-Oncoplot
+
+For the COSMIC genes that are shared between both studies, show the oncoplot side by side
+
+```{r}
+cosmic_genes_tissue<- getGeneSummary(merged_maf_tissue_only)$Hugo_Symbol[getGeneSummary(merged_maf_tissue_only)$Hugo_Symbol %in% cgc_67$SYMBOL]
+shared_cosmic_genes_tissue <- intersect(cosmic_genes_tissue, cosmic_genes_tcga)
+
+png(paste0(res_path,"co_oncoplot.png"), units = "in", res = 300, width = 14, height = 8)
+coOncoplot(m1 = merged_maf, m2 = maftools_pdac, m1Name = 'PDO_TISSUE', m2Name = 'TCGA_PAAD', genes = shared_cosmic_genes, removeNonMutated = TRUE)
+dev.off()
+```
+
+## Compare TMB
+
+```{r}
+png(paste0(res_path,"tcgaCompare_tmb.png"), units = "in", res = 300, width = 12, height = 12)
+tcgaCompare(maf = merged_maf, cohortName = 'PDAC', logscale = TRUE, capture_size = 36.5, tcga_cohorts="PAAD")
+dev.off()
+
+png(paste0(res_path,"tcgaCompare_tmb_tissueOnly.png"), units = "in", res = 300, width = 12, height = 12)
+tcgaCompare(maf = merged_maf_tissue_only, cohortName = 'PDAC', logscale = TRUE, capture_size = 36.5, tcga_cohorts="PAAD")
+dev.off()
+```
+
+
+
+
+

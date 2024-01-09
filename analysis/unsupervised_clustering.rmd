@@ -1,0 +1,110 @@
+---
+title: "pdo_tissue_clustering"
+output: html_document
+date: "2023-09-11"
+---
+
+```{r}
+library(tidyr)
+library(dplyr)
+library(readr)
+library(stringr)
+library(ggplot2)
+library(maftools)
+library(ComplexHeatmap)
+library(circlize)
+library(RColorBrewer)
+
+res_path <- "r_analysis_pad50bp/"
+```
+
+```{r}
+mymaf <- read.maf("merged_mafs_220923_noPCA117_maftools.maf")
+mymaf@clinical.data <- mymaf@clinical.data %>%
+  tidyr::separate(Tumor_Sample_Barcode, into = c("Patient", "Sample", "Treatment"), sep = "_", remove=FALSE) %>%
+  dplyr::mutate(Sample_Label = stringr::str_extract(Sample, "[A-Za-z]+")) %>%
+  data.table::setDT()
+```
+
+```{r}
+# Extract metadata to add to heatmap
+patients<-mymaf@clinical.data$Patient
+sample_conditions <- mymaf@clinical.data$Treatment
+
+# Create color palette
+patients_color_palette <- colorRampPalette(brewer.pal(8, "Dark2"))(length(unique(patients)))
+conditions_color_palette <- viridis::viridis(length(unique(sample_conditions)), option="D")
+
+# Create named vector mapping prefixes to colors
+patients_color_mapping <- setNames(patients_color_palette, unique(patients))
+df_patients_color_mapping <- patients_color_mapping[patients]
+names(df_patients_color_mapping) <- mymaf@clinical.data$Tumor_Sample_Barcode
+
+conditions_color_mapping <- setNames(conditions_color_palette, unique(sample_conditions))
+df_conditions_color_mapping <- conditions_color_mapping[sample_conditions]
+names(df_conditions_color_mapping) <- mymaf@clinical.data$Tumor_Sample_Barcode
+
+# Create a data frame for the heatmap annotation
+annotation_df <- data.frame(patients = patients, conditions = sample_conditions)
+rownames(annotation_df) <- mymaf@clinical.data$Tumor_Sample_Barcode
+```
+
+```{r}
+# Create a unique mutation identifier
+mutation_data <- mymaf@data %>% 
+  mutate(unique_mutation = paste(Hugo_Symbol, HGVSp, sep = "_"))
+mymaf@data
+# Pivot to create a matrix suitable for clustering
+# We use the tidyr package's pivot_wider function to achieve this
+mutation_matrix <- mutation_data %>%
+  dplyr::select(Tumor_Sample_Barcode, unique_mutation) %>%
+  dplyr::distinct() %>%
+  dplyr::mutate(value = 1) %>% # Add a value column
+  tidyr::pivot_wider(names_from = unique_mutation, values_from = value, values_fill = 0) # Pivot the data
+heatmap_data <- t(mutation_matrix[,-1])
+colnames(heatmap_data) <- mutation_matrix[, 1] %>% pull()
+
+#oncoplot(mymaf, writeMatrix=TRUE)
+# Define a color mapping for mutations
+col_fun <- c("0" = "black", "1" = "yellow")
+```
+
+```{r}
+set.seed(3)
+jaccard_dist = function(x, y) {
+	s = 1 - sum(x & y)/sum(x | y)
+	if(is.na(s)) {
+		return(1)
+	} else {
+		return(s)
+	}
+}
+
+hamming_dist <- function(x, y) {
+  if (length(x) != length(y)) {
+    stop("Vectors must be of the same length!")
+  }
+  
+  sum(x != y)
+}
+
+# Create the heatmap with unsupervised clustering
+ht <- Heatmap(heatmap_data, 
+        name = "mutations",
+        col = col_fun,
+        column_dend_height = unit(50, "mm"),
+        show_column_names = TRUE, # Show column names
+        show_row_names = FALSE,
+        cluster_rows = FALSE, # don't cluster mutations
+        column_names_gp = gpar(fontsize = 10),  # reduce column names font size
+        cluster_columns = TRUE, # cluster samples
+        column_title="Unsupervised clustering of PDO and patient tissue samples based on the SNPs and INDELs mutational landscape",
+        clustering_distance_columns=jaccard_dist,
+        column_km=6,
+        show_heatmap_legend=TRUE,
+        top_annotation = HeatmapAnnotation(df = annotation_df, col = list(patients = patients_color_mapping, conditions=conditions_color_mapping)))
+
+png(paste0(res_path,"unsupervised_clustering_snps_indels_shortName.png"), res=300, units = "in", width = 15, height=10)
+ht
+dev.off()
+```

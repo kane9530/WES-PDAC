@@ -1,0 +1,14 @@
+{
+    "input":"rnaseq_nfcore_input.csv",
+    "outdir":"results_rnaseq_samples",
+    "genome":"GRCh38",
+    "aligner":"star_salmon",
+    "pseudo_aligner":"salmon",
+    "gtf":"/media/gedac/kane/projects/booney_wes/ref_rnaseq/genes.gtf",
+    "gene_bed":"/media/gedac/kane/projects/booney_wes/ref_rnaseq/genes.bed",
+    "star_index":"/media/gedac/kane/projects/booney_wes/ref_rnaseq/STARIndex",
+    "fasta":"/media/gedac/kane/projects/booney_wes/ref_rnaseq/genome.fa",
+    "max_cpus": 64,
+    "max_time": "960.h",
+    "max_memory": "200.GB"
+}

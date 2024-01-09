@@ -1,0 +1,16 @@
+76B_CM-_vs_76B_PBMC     139 PASS
+76B_CM-_vs_76B_PBMC      47 base_qual
+76B_CM-_vs_76B_PBMC     942 clustered_events
+76B_CM-_vs_76B_PBMC     521 contamination
+76B_CM-_vs_76B_PBMC      24 fragment
+76B_CM-_vs_76B_PBMC     763 germline
+76B_CM-_vs_76B_PBMC     884 haplotype
+76B_CM-_vs_76B_PBMC     212 map_qual
+76B_CM-_vs_76B_PBMC     989 multiallelic
+76B_CM-_vs_76B_PBMC    3221 normal_artifact
+76B_CM-_vs_76B_PBMC     341 orientation
+76B_CM-_vs_76B_PBMC     832 panel_of_normals
+76B_CM-_vs_76B_PBMC       5 position
+76B_CM-_vs_76B_PBMC    1557 slippage
+76B_CM-_vs_76B_PBMC     925 strand_bias
+76B_CM-_vs_76B_PBMC    2040 weak_evidence

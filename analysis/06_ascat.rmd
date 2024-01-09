@@ -1,0 +1,261 @@
+---
+title: "06_ascat"
+output: html_document
+date: "2023-09-11"
+---
+
+```{r}
+library(tidyr)
+library(dplyr)
+library(readr)
+library(stringr)
+library(ggplot2)
+library(maftools)
+library(ConsensusClusterPlus)
+library(ComplexHeatmap)
+library(circlize)
+library(viridis)
+```
+
+
+```{r}
+add_sample_info <- function(file_path){
+  file <- readr::read_tsv(file_path, show_col_types = FALSE)
+  file <- file %>%
+    dplyr::mutate(sample_name = stringr::str_extract(basename(file_path), "^[^.]+")) %>%
+    dplyr::mutate(patient_id = str_extract(sample_name, "^[0-9]+"),
+         treatment = str_extract(sample_name, "(?<=_)[^_]+(?=_)"),
+         sample_label = case_when(
+          str_detect(sample_name, "^([0-9]+B)") ~ "B",
+          str_detect(sample_name, "^([0-9]+RT)") ~ "RT",
+          TRUE ~ "None"))
+  return(file)
+}
+```
+
+
+```{r}
+# Listing file paths
+cnvs_paths <- list.files("./results/ascat", full.names=TRUE, recursive=TRUE) %>%
+  grep(pattern="\\cnvs.txt$", value =TRUE)
+metrics_paths <- list.files("./results/ascat", full.names=TRUE, recursive=TRUE) %>%
+  grep(pattern="\\metrics.txt$", value =TRUE)
+purityploidy_paths <- list.files("./results/ascat", full.names=TRUE, recursive=TRUE) %>%
+  grep(pattern="\\purityploidy.txt$", value =TRUE)
+segments_paths <- list.files("./results/ascat", full.names=TRUE, recursive=TRUE) %>%
+  grep(pattern="\\ments.txt$", value =TRUE)
+
+# Reading in dataframes
+cnvs <- purrr::map_dfr(metrics_paths, add_sample_info)
+metrics <- purrr::map_dfr(metrics_paths, add_sample_info)
+purityploidy <- purrr::map_dfr(purityploidy_paths, add_sample_info)
+segments <- purrr::map_dfr(segments_paths, add_sample_info)
+```
+
+
+Plotting ploidy, purity, GI, and LOH scores.
+```{r}
+ploidy <- ggplot(purityploidy, aes(x = sample_name, y = Ploidy, fill = treatment)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_minimal() +
+  labs(x = "Sample", y = "Ploidy", fill = "Treatment") +
+  facet_wrap(~patient_id, scales = "free_x", labeller = as_labeller(function(x) paste0("PCA", x)))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 5)) + 
+  ggtitle("Average ploidy per sample")
+
+purity <- ggplot(purityploidy, aes(x = sample_name, y = AberrantCellFraction, fill = treatment)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_minimal() +
+  labs(x = "Sample", y = "Tumor purity", fill = "Treatment") +
+  facet_wrap(~patient_id, scales = "free_x", labeller = as_labeller(function(x) paste0("PCA", x)))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 5))+ 
+  ggtitle("Purity (Aberrant cell fraction)")
+
+LOH <-  ggplot(metrics, aes(x = sample_name, y = LOH, fill = treatment)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_minimal() +
+  labs(x = "Sample", y = "LOH score", fill = "Treatment") +
+  facet_wrap(~patient_id, scales = "free_x", labeller = as_labeller(function(x) paste0("PCA", x)))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 5)) +
+  ggtitle("Loss of Heterozygosity proportion")
+
+GI <-  ggplot(metrics, aes(x = sample_name, y = GI, fill = treatment)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_minimal() +
+  labs(x = "Sample", y = "Genomic Instability score", fill = "Treatment") +
+  facet_wrap(~patient_id, scales = "free_x", labeller = as_labeller(function(x) paste0("PCA", x)))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 5))+
+  ggtitle("Genomic Instability score")
+
+png("results/ascat_scores.png", res=300, units = "in", width = 15, height=15)
+cowplot::plot_grid(ploidy, purity, LOH, GI, labels="AUTO", nrow=2 )
+dev.off()
+```
+
+# Construct copy number profile summarisation following Steele et al., (2022)
+See Extended fig 1i-l plots.
+
+```{r}
+# Create variables for TCN and segment size
+df <- segments %>%
+  dplyr::mutate(TCN = nMajor + nMinor,
+         segment_size_kb = (endpos - startpos) / 1000,
+         heterozygosity = case_when(
+           nMajor > 0 & nMinor > 0 ~ "heterozygous",
+           nMajor > 0 & nMinor == 0 ~ "LOH",
+           nMajor == 0 & nMinor > 0  ~ "LOH",
+           nMajor == 0 & nMinor == 0 ~ "homozygous deletion"
+         ),
+         TCN_category = case_when(
+           TCN == 0 ~ "homozygous deletion",
+           TCN == 1 ~ "deletion leading to LOH",
+           TCN == 2 ~ "wild type",
+           TCN %in% 3:4 ~ "minor gain",
+           TCN %in% 5:8 ~ "moderate gain",
+           TCN >= 9 ~ "high-level amplification"
+         ),
+         size_category = case_when(
+           segment_size_kb <= 100 ~ "0-100kb",
+           segment_size_kb > 100 & segment_size_kb <= 1000 ~ "100kb-1Mb",
+           segment_size_kb > 1000 & segment_size_kb <= 10000 ~ "1Mb-10Mb",
+           segment_size_kb > 10000 & segment_size_kb <= 40000 ~ "10Mb-40Mb",
+           segment_size_kb > 40000 ~ ">40Mb"
+         ))
+
+# Count occurrences of each combination of categories
+df_counts <- df %>%
+  group_by(sample,heterozygosity, TCN_category, size_category) %>%
+  summarize(n = n(), .groups = "drop")
+df_counts
+# Create complete set of all combinations of categories
+all_combinations <- expand_grid(sample = unique(df_counts$sample),
+  heterozygosity = c("heterozygous", "LOH", "homozygous deletion"),
+                                TCN_category = c("homozygous deletion",
+                                                 "deletion leading to LOH",
+                                                 "wild type",
+                                                 "minor gain",
+                                                 "moderate gain",
+                                                 "high-level amplification"),
+                                size_category = unique(df$size_category)) %>%
+  dplyr::filter(!(heterozygosity == "homozygous deletion" & TCN_category != "homozygous deletion" |
+                  heterozygosity == "LOH" & TCN_category == "homozygous deletion" |
+                  heterozygosity == "heterozygous" & TCN_category %in% c("homozygous deletion", 
+                                                                         "deletion leading to LOH")))
+
+all_combinations
+
+# Join actual counts with all combinations
+df_final <- left_join(all_combinations, df_counts, by = c("heterozygosity", "TCN_category", "size_category", "sample"))
+df_final$n[is.na(df_final$n)] <- 0
+
+
+# A bit more wrangling to combine the homozygous deletion categories
+df_sub <- df_final %>%
+  filter(heterozygosity == "homozygous deletion" &
+         size_category %in% c(">40Mb", "10Mb-40Mb", "1Mb-10Mb"))
+
+df_sub_combined <- df_sub %>%
+  summarise(heterozygosity = unique(heterozygosity),
+            TCN_category = unique(TCN_category),
+            sample = unique(sample),
+            size_category = "1Mb+",
+            n = sum(n))
+
+df_rest <- df_final %>%
+  filter(!(heterozygosity == "homozygous deletion" &
+           size_category %in% c(">40Mb", "10Mb-40Mb", "1Mb-10Mb")))
+
+df_final <- bind_rows(df_rest, df_sub_combined)  %>%
+  dplyr::mutate(TCN = case_when(
+           TCN_category == "homozygous deletion" ~ "0",
+           TCN_category == "deletion leading to LOH" ~ "1",
+           TCN_category == "wild type" ~ "2",
+           TCN_category == "minor gain" ~ "3-4",
+           TCN_category == "moderate gain"~ "5-8",
+           TCN_category == "high-level amplification" ~ "9"
+         ))%>%
+    dplyr::mutate(patient_id = str_extract(sample, "^[0-9]+"),
+         treatment = str_extract(sample, "(?<=_)[^_]+(?=_)"),
+         sample_label = case_when(
+          str_detect(sample, "^([0-9]+B)") ~ "B",
+          str_detect(sample, "^([0-9]+RT)") ~ "RT",
+          TRUE ~ "None"),
+         sample_name_clean = paste(patient_id, sample_label, treatment, sep="_"))
+```
+
+```{r}
+plot_cn_signature <- function(df, patient_id, viridis_opt="D", strip.text.x.size = 8){
+  cn_signature_plot <- df %>%
+  ggplot(aes(x=TCN, y=n, fill = size_category))+
+  geom_bar(stat="identity") +
+  facet_grid(heterozygosity ~ sample_name_clean) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=90),
+        strip.text.x = element_text(size = strip.text.x.size))+
+  labs(y="Segment count") +
+  scale_fill_viridis_d(option=viridis_opt) +
+  ggtitle(paste0("PCN", patient_id))
+  print(cn_signature_plot)
+}
+
+df_113 <- df_final %>%
+  dplyr::filter(patient_id=="113")
+df_117 <- df_final %>%
+  dplyr::filter(patient_id=="117")
+df_128 <- df_final %>%
+  dplyr::filter(patient_id=="128")
+df_28 <- df_final %>%
+  dplyr::filter(patient_id=="28")
+df_67 <- df_final %>%
+  dplyr::filter(patient_id=="67")
+df_81 <- df_final %>%
+  dplyr::filter(patient_id=="81")
+df_96 <- df_final %>%
+  dplyr::filter(patient_id=="96")
+
+plot_113 <- plot_cn_signature(df_113, "113")
+plot_117 <- plot_cn_signature(df_117, "117", strip.text.x.size=12)
+plot_128 <- plot_cn_signature(df_128, "128")
+plot_28 <- plot_cn_signature(df_28, "28")
+plot_67 <- plot_cn_signature(df_67, "67")
+plot_81 <- plot_cn_signature(df_81, "81")
+plot_96 <- plot_cn_signature(df_96, "96")
+
+plots <- list(plot_113, plot_117, plot_128, plot_28, plot_67, plot_81, plot_96)
+for (i in 1:length(unique(df_final$patient_id))){
+  png(paste0("results/cn_signature_", unique(df_final$patient_id)[i], ".png"), res=300, units = "in", width = 7, height=7)
+  print(plots[[i]])
+  dev.off()
+}
+# Fix dimensions of plot for pca67 due to many samples
+png(paste0("results/cn_signatures/cn_signature_", unique(df_final$patient_id)[5], ".png"), res=300, units = "in", width = 15, height=10)
+print(plots[[5]])
+dev.off()
+```
+
+```{r}
+mut_data <- mymaf@data %>%
+  dplyr::mutate(patient_id = str_extract(Tumor_Sample_Barcode, "^PCA[0-9]+"))
+  
+mut_data_summary <- mut_data %>%
+  dplyr::group_by(Hugo_Symbol) %>%
+  summarise(num_patients = n_distinct(patient_id)) %>%
+  arrange(desc(num_patients)) 
+
+count_data <- mut_data_summary %>%
+  group_by(num_patients) %>%
+  summarise(num_genes = n()) %>%
+  arrange(num_patients)
+
+png("results/num_gene_category.png", res=300, units = "in", width = 10, height=10)
+ggplot(count_data, aes(x = factor(num_patients), y = num_genes, fill = num_genes)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label=num_genes), vjust=-0.2) +
+  scale_fill_viridis() +
+  labs(x = "Number of patients with mutated gene (out of 7 patients)", y = "Number of genes") +
+  ggtitle("Number of genes for each category of patient count") + 
+  theme_minimal()
+dev.off()
+
+mymaf@variants.per.sample
+```

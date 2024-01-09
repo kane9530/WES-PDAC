@@ -1,0 +1,16 @@
+63RT3_TISSUE_vs_63RT3_PBMC      78 PASS
+63RT3_TISSUE_vs_63RT3_PBMC      65 base_qual
+63RT3_TISSUE_vs_63RT3_PBMC     923 clustered_events
+63RT3_TISSUE_vs_63RT3_PBMC     403 contamination
+63RT3_TISSUE_vs_63RT3_PBMC      21 fragment
+63RT3_TISSUE_vs_63RT3_PBMC     755 germline
+63RT3_TISSUE_vs_63RT3_PBMC     875 haplotype
+63RT3_TISSUE_vs_63RT3_PBMC     154 map_qual
+63RT3_TISSUE_vs_63RT3_PBMC     992 multiallelic
+63RT3_TISSUE_vs_63RT3_PBMC    3112 normal_artifact
+63RT3_TISSUE_vs_63RT3_PBMC     258 orientation
+63RT3_TISSUE_vs_63RT3_PBMC     816 panel_of_normals
+63RT3_TISSUE_vs_63RT3_PBMC       3 position
+63RT3_TISSUE_vs_63RT3_PBMC    1602 slippage
+63RT3_TISSUE_vs_63RT3_PBMC     753 strand_bias
+63RT3_TISSUE_vs_63RT3_PBMC    2095 weak_evidence

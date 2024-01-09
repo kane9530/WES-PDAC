@@ -1,0 +1,21 @@
+{
+    "outdir": "results_wes_full_40samples_pad50bp",
+    "wes": true,
+    "intervals": "hg38_exome_v2.0.2_targets_sorted_validated.re_annotated.sorted.pad50bp.bed",
+    "tools": "strelka,mutect2,mpileup,snpeff,vep,msisensorpro,freebayes,ascat",
+    "only_paired_variant_calling": true,
+    "nulceotides_per_second": 1000000,
+    "vep_include_fasta": true,
+    "vep_dbnsfp": true,
+    "dbnsfp": "databases/dbNSFP4.4a_grch38.gz",
+    "dbnsfp_tbi": "databases/dbNSFP4.4a_grch38.gz.tbi",
+    "dbnsfp_fields": "ALL",
+    "vep_loftee": true,
+    "vep_spliceregion": true,
+    "email": "kane9530@hotmail.com",
+    "email_on_fail": "kane9530@hotmail.com",
+    "ascat_alleles": "/media/gedac/kane/projects/booney_wes/prep_ascat/1000G_loci_hg38/battenberg_alleles_on_target_hg38/battenberg_alleles_on_target_hg38.zip",
+    "ascat_loci": "/media/gedac/kane/projects/booney_wes/prep_ascat/1000G_loci_hg38/battenberg_loci_on_target_hg38/battenberg_loci_on_target_hg38.zip",
+    "ascat_loci_gc": "/media/gedac/kane/projects/booney_wes/prep_ascat/GC_G1000_on_target_hg38.zip",
+    "ascat_loci_rt": "/media/gedac/kane/projects/booney_wes/prep_ascat/RT_G1000_on_target_hg38.zip"
+}

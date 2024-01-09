@@ -1,0 +1,15 @@
+80B_CM+     514 PASS
+80B_CM+      65 base_qual
+80B_CM+    3835 clustered_events
+80B_CM+     210 contamination
+80B_CM+      49 fragment
+80B_CM+    7281 germline
+80B_CM+    3064 haplotype
+80B_CM+     395 map_qual
+80B_CM+    1650 multiallelic
+80B_CM+     518 orientation
+80B_CM+    4366 panel_of_normals
+80B_CM+       7 position
+80B_CM+    1703 slippage
+80B_CM+     469 strand_bias
+80B_CM+    2734 weak_evidence
