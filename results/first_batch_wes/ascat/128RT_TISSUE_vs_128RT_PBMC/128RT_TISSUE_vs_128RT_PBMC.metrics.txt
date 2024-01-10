@@ -1,0 +1,2 @@
+sex	tumour_mapd	normal_mapd	GC_correction_before	GC_correction_after	RT_correction_before	RT_correction_after	n_het_SNP	n_segs_logR	n_segs_BAF	n_segs_logRBAF_diff	frac_homo	purity	ploidy	goodness_of_fit	size_intermediate_segments	size_odd_segments	n_segs	segs_size	n_segs_1kSNP	homdel_segs	homdel_largest	homdel_size	homdel_fraction	LOH	mode_minA	mode_majA	WGD	GI
+XY	0.2215	0	1kb=0.1877 / 10kb=0.2122	1kb=0 / 10kb=0	Mcf7=0.1452	Mcf7=0	4481	57	39	18	0.023	0.29	1.8295	80.4795	263590028	2666400656	40	2781724376	8.9266	0	0	0	0	0.2169	1	1	0	0.2383

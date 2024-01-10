@@ -1,0 +1,2 @@
+task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
+1	d6/2eed6e	1481336	NFCORE_HLATYPING:HLATYPING:INPUT_CHECK:SAMPLESHEET_CHECK (wes_input_full_optitype.csv)	FAILED	1	2023-06-21 09:43:15.978	1.5s	1.5s	-	-	-	-	-
