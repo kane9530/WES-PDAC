@@ -31,28 +31,57 @@ add_sample_info <- function(file_path){
           TRUE ~ "None"))
   return(file)
 }
+
+read_file <- function(file_path) {
+  # Try to read the file and handle any errors
+  tryCatch({
+    df <- read_delim(file_path, delim = "\t", escape_double = FALSE, col_types = cols(), trim_ws = TRUE)
+    df <- df %>%
+    dplyr::mutate(sample_name = stringr::str_extract(basename(file_path), "^[^.]+")) %>%
+    dplyr::mutate(patient_id = str_extract(sample_name, "^[0-9]+"),
+         treatment = str_extract(sample_name, "(?<=_)[^_]+(?=_)"),
+         sample_label = case_when(
+          str_detect(sample_name, "^([0-9]+B)") ~ "B",
+          str_detect(sample_name, "^([0-9]+RT)") ~ "RT",
+          TRUE ~ "None"))
+    
+    # Check if 'WGD' column exists and is of type character, then convert it to numeric
+    if ("WGD" %in% names(df) && is.numeric(df$WGD)) {
+      df$WGD <- as.character(df$WGD)
+    }
+
+    # Ensure the output is a data frame
+    if (!is.data.frame(df)) {
+      stop("The output is not a data frame.")
+    }
+
+    return(df)
+  }, error = function(e) {
+    message("Error reading file: ", file_path, "\nError: ", e$message)
+    return(NULL) # Return NULL if there's an error
+  })
+}
 ```
 
 
 ```{r}
 # Listing file paths
-cnvs_paths <- list.files("./results/ascat", full.names=TRUE, recursive=TRUE) %>%
+cnvs_paths <- list.files("../results/combined_batches_wes/ascat", full.names=TRUE, recursive=TRUE) %>%
   grep(pattern="\\cnvs.txt$", value =TRUE)
-metrics_paths <- list.files("./results/ascat", full.names=TRUE, recursive=TRUE) %>%
+metrics_paths <- list.files("../results/combined_batches_wes/ascat", full.names=TRUE, recursive=TRUE) %>%
   grep(pattern="\\metrics.txt$", value =TRUE)
-purityploidy_paths <- list.files("./results/ascat", full.names=TRUE, recursive=TRUE) %>%
+purityploidy_paths <- list.files("../results/combined_batches_wes/ascat", full.names=TRUE, recursive=TRUE) %>%
   grep(pattern="\\purityploidy.txt$", value =TRUE)
-segments_paths <- list.files("./results/ascat", full.names=TRUE, recursive=TRUE) %>%
+segments_paths <- list.files("../results/combined_batches_wes/ascat", full.names=TRUE, recursive=TRUE) %>%
   grep(pattern="\\ments.txt$", value =TRUE)
 
-# Reading in dataframes
-cnvs <- purrr::map_dfr(metrics_paths, add_sample_info)
-metrics <- purrr::map_dfr(metrics_paths, add_sample_info)
+cnvs <- purrr::map_dfr(cnvs_paths, add_sample_info)
+
+# Read and combine all files
+metrics <- purrr::map_dfr(metrics_paths, read_file)
 purityploidy <- purrr::map_dfr(purityploidy_paths, add_sample_info)
 segments <- purrr::map_dfr(segments_paths, add_sample_info)
 ```
-
-
 Plotting ploidy, purity, GI, and LOH scores.
 ```{r}
 ploidy <- ggplot(purityploidy, aes(x = sample_name, y = Ploidy, fill = treatment)) +
@@ -86,8 +115,8 @@ GI <-  ggplot(metrics, aes(x = sample_name, y = GI, fill = treatment)) +
   facet_wrap(~patient_id, scales = "free_x", labeller = as_labeller(function(x) paste0("PCA", x)))+
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 5))+
   ggtitle("Genomic Instability score")
-
-png("results/ascat_scores.png", res=300, units = "in", width = 15, height=15)
+getwd()
+png("../results/combined_batches_wes/ascat_scores.png", res=300, units = "in", width = 15, height=15)
 cowplot::plot_grid(ploidy, purity, LOH, GI, labels="AUTO", nrow=2 )
 dev.off()
 ```

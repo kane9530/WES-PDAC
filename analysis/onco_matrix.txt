@@ -1,0 +1,112 @@
+PCA67_67RT_CM+	PCA67_67B_CM+	PCA67_67B_T1	PCA67_67B_CM-	PCA67_67RT_T2	PCA67_67B_T2	PCA67_67RT_CM-	PCA67_67RT_TISSUE	PCA67_67RT_T1	PCA128_128RT_CM-	PCA128_128RT_CM+	PCA128_128RT_T2	PCA128_128RT_TISSUE	PCA128_128RT_T1	PCA28_28RT_TISSUE	PCA28_28RT_T2	PCA28_28RT_CM+	PCA28_28RT_T1	PCA28_28RT_CM-	PCA96_96RT_T2	PCA96_96RT_CM-	PCA96_96RT_CM+	PCA96_96RT_T1	PCA96_96RT_TISSUE	PCA113_113B_T1	PCA113_113B_CM-	PCA113_113B_CM+	PCA113_113B_T2	PCA124_124B_CM-	PCA124_124B_CM+	PCA124_124B_T1	PCA124_124B_T2	PCA81_81B_T2	PCA81_81B_CM-	PCA81_81B_T1	PCA81_81B_CM+	PCA117_117B_CM-	PCA117_117B_CM+	PCA63_63RT3_CM-	PCA63_63RT3_TISSUE	PCA92_92B_CM-	PCA92_92B_TISSUE	PCA97_97RT_CM-	PCA97_97RT_TISSUE	PCA123_123B_CM-	PCA127_127B_CM-	PCA35_35B_CM-	PCA71_71B_CM-	PCA76_76B_CM-	PCA80_80B_CM+
+KRAS	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation		Missense_Mutation	Missense_Mutation	Missense_Mutation		Missense_Mutation	Missense_Mutation		Missense_Mutation	Missense_Mutation	Multi_Hit	Multi_Hit	
+TP53	In_Frame_Del	In_Frame_Del	In_Frame_Del	In_Frame_Del	In_Frame_Del	In_Frame_Del	In_Frame_Del	In_Frame_Del	In_Frame_Del	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation											Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation					Missense_Mutation		Frame_Shift_Ins	Frame_Shift_Ins	Frame_Shift_Del				Multi_Hit	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	
+ARID1A										Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Frame_Shift_Del	Frame_Shift_Del	Frame_Shift_Del	Frame_Shift_Del	Multi_Hit	Multi_Hit	Multi_Hit	Multi_Hit	Multi_Hit	Multi_Hit													Nonsense_Mutation													
+CDKN2A										Multi_Hit	Multi_Hit	Multi_Hit	Multi_Hit	Multi_Hit															In_Frame_Del	In_Frame_Del	In_Frame_Del	In_Frame_Del					Multi_Hit									Multi_Hit		Frame_Shift_Ins	Missense_Mutation	
+ATM															Frame_Shift_Del	Frame_Shift_Del	Frame_Shift_Del	Frame_Shift_Del	Frame_Shift_Del	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation																				Missense_Mutation							
+SMAD4	Missense_Mutation									Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation																							Nonsense_Mutation		Frame_Shift_Del							Nonsense_Mutation	Missense_Mutation			
+FEV										Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation															Missense_Mutation								Missense_Mutation													
+KDM6A										Frame_Shift_Ins	Frame_Shift_Ins	Frame_Shift_Ins	Frame_Shift_Ins	Frame_Shift_Ins																							Frame_Shift_Ins													
+PHOX2B										Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation	Nonsense_Mutation																							Nonsense_Mutation													
+TPR															Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation																												Missense_Mutation			
+WIF1															Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation																															Missense_Mutation
+RNF43															Missense_Mutation														Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation																		
+HOXC13																									Translation_Start_Site	Translation_Start_Site	Translation_Start_Site	Translation_Start_Site																						
+KMT2D		Missense_Mutation													Missense_Mutation					Nonsense_Mutation																						Missense_Mutation								
+OLIG2																																	Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation														
+SUZ12																Missense_Mutation	Missense_Mutation	Missense_Mutation	Missense_Mutation																															
+ETV5																																	Missense_Mutation	Missense_Mutation				Missense_Mutation												
+NUP214		Missense_Mutation																															Missense_Mutation																Frame_Shift_Del	
+RNF213			Missense_Mutation																					Missense_Mutation																										Missense_Mutation
+AKAP9			Multi_Hit																																												Missense_Mutation			
+ABL2																									Frame_Shift_Del													Missense_Mutation												
+AKT2																																											Missense_Mutation	Missense_Mutation						
+BCOR																																															Missense_Mutation	Frame_Shift_Del		
+CIC															Missense_Mutation																							Missense_Mutation												
+ECT2L																																					Frame_Shift_Del													Splice_Site
+ERCC2																								Missense_Mutation																							Missense_Mutation			
+EXT2		Missense_Mutation																																																Missense_Mutation
+FANCD2																																															Splice_Site			Splice_Site
+FLT3																Missense_Mutation	Missense_Mutation																																	
+FNBP1																		Frame_Shift_Del											Missense_Mutation																					
+MAF										Missense_Mutation																												Missense_Mutation												
+NUTM1																Missense_Mutation																																		Missense_Mutation
+PATZ1																																							Missense_Mutation	Missense_Mutation										
+PPARG																																											Frame_Shift_Ins	Frame_Shift_Ins						
+SMARCA4															Missense_Mutation											Missense_Mutation																								
+VTI1A				Missense_Mutation																																														Nonsense_Mutation
+ALDH2																																						Missense_Mutation												
+AMER1																																													Missense_Mutation					
+ARHGEF12																																																Nonsense_Mutation		
+ASXL1																																																		Missense_Mutation
+BAP1																																																		Frame_Shift_Del
+BCL11B																																		Missense_Mutation																
+BCL6																														Nonsense_Mutation																				
+BIRC3																			Missense_Mutation																															
+BRCA2																																												Missense_Mutation						
+BRD4																Missense_Mutation																																		
+BRIP1																											Missense_Mutation																							
+CBL																																					In_Frame_Del													
+CEBPA																																					Missense_Mutation													
+CIITA																														Missense_Mutation																				
+CLTC																																																	Missense_Mutation	
+CREB3L1											Missense_Mutation																																							
+CRLF2																																																		Missense_Mutation
+ELF4	Missense_Mutation																																																	
+EML4																Frame_Shift_Ins																																		
+EP300																								Missense_Mutation																										
+ERBB2					Missense_Mutation																																													
+FBXW7																																							Missense_Mutation											
+FGFR3																								Missense_Mutation																										
+FH					Missense_Mutation																																													
+FLCN																										Missense_Mutation																								
+FUS															Missense_Mutation																																			
+HIP1						Missense_Mutation																																												
+HOXD11																		Missense_Mutation																																
+IDH1																											Missense_Mutation																							
+IL21R																									Missense_Mutation																									
+IL6ST																																							Frame_Shift_Del											
+IRF4																																													Missense_Mutation					
+JAK2				Nonsense_Mutation																																														
+KDM5C																												Missense_Mutation																						
+LCP1							Splice_Site																																											
+LRIG3																										Missense_Mutation																								
+LYL1																																								Missense_Mutation										
+MAP2K4												Missense_Mutation																																						
+MNX1																																															In_Frame_Ins			
+MSI2																																													Missense_Mutation					
+MUC1							Missense_Mutation																																											
+MYC				Missense_Mutation																																														
+MYCL																													Missense_Mutation																					
+NACA																																					Missense_Mutation													
+NIN																																							Missense_Mutation											
+NOTCH1																																					Missense_Mutation													
+NOTCH2																																													Missense_Mutation					
+NTRK3																		Missense_Mutation																																
+P2RY8													Missense_Mutation																																					
+PALB2																																																Missense_Mutation		
+PER1															Nonsense_Mutation																																			
+PIK3CA																																						Missense_Mutation												
+PML							Missense_Mutation																																											
+RAF1											Missense_Mutation																																							
+RARA																																																	Missense_Mutation	
+RB1								Missense_Mutation																																										
+RET																																			Missense_Mutation															
+ROS1																																																		Missense_Mutation
+RPL5																																																	Missense_Mutation	
+SDC4																																					Missense_Mutation													
+SETBP1																																																	Missense_Mutation	
+SLC45A3																	Missense_Mutation																																	
+SRSF2																	Missense_Mutation																																	
+TAL1																																																	Missense_Mutation	
+TCF12													Missense_Mutation																																					
+TCF7L2																														Missense_Mutation																				
+TET2																	Missense_Mutation																																	
+TFE3																				Missense_Mutation																														
+TFPT								Missense_Mutation																																										
+THRAP3																																																		Missense_Mutation
+TLX1									Missense_Mutation																																									
+TLX3				Missense_Mutation																																														
+TRIP11																																					Missense_Mutation													
+VHL																			Missense_Mutation																															
+XPC																																						Missense_Mutation												

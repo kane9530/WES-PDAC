@@ -5,6 +5,7 @@ date: "2023-05-30"
 ---
 
 ```{r}
+library(RColorBrewer)
 library(maftools)
 library(ggplot2)
 library("BSgenome.Hsapiens.UCSC.hg38", quietly = TRUE)
@@ -12,21 +13,29 @@ library('NMF')
 library(sigminer)
 library(VariantAnnotation)
 
-res_path <- "./r_analysis_pad50bp"
+res_path <- "../results/combined_batches_wes/"
 ```
 # Loading in MAF files
 
-## Union of both callers
 ```{r}
 maf_files = c()
-for (maf_file in list.files("/media/gedac/kane/projects/booney_wes/results_wes_full_40samples_pad50bp/combined/maf",
+
+for (maf_file in list.files("/media/gedac/kane/projects/booney_wes_clean/results/first_batch_wes/maf",
+                            full.names=TRUE)){
+  mymaf = read.maf(maf=maf_file)
+  maf_files = append(maf_files, mymaf)
+}
+
+for (maf_file in list.files("/media/gedac/kane/projects/booney_wes_clean/results/second_batch_wes/maf",
                             full.names=TRUE)){
   mymaf = read.maf(maf=maf_file)
   maf_files = append(maf_files, mymaf)
 }
 
 merged_maf <- maftools::merge_mafs(maf_files)
-merged_maf@maf.silent
+# Creating the patient and sample column for better annotation
+
+write.mafSummary(merged_maf, basename="merged_mafs_allBatches_090124")
 # Creating the patient and sample column for better annotation
 #write.mafSummary(merged_maf, basename="merged_mafs_190923")
 ```
@@ -34,57 +43,27 @@ merged_maf@maf.silent
 # Discard PCA117 PDO sample
 
 ```{r}
-merged_maf <- read.maf("merged_mafs_190923_maftools.maf", 
+merged_maf <- read.maf("../results/combined_batches_wes/merged_mafs_allBatches_090124_maftools.maf", 
                  verbose=TRUE)
 tsb = merged_maf@clinical.data$Tumor_Sample_Barcode[-grep(merged_maf@clinical.data$Tumor_Sample_Barcode, pattern="PCA117_*")]
 merged_maf_without_pca117 <- subsetMaf(merged_maf, tsb= tsb)
 write.mafSummary(merged_maf_without_pca117, basename="merged_mafs_220923_noPCA117")
 ```
 
-
-# Intersction of both callers
-
+# Loading MAF file (full)
 ```{r}
-maf_files = c()
-for (maf_file in list.files("/media/gedac/kane/projects/booney_wes/results_wes_full_40samples_pad50bp/combined/maf/intersect",
-                            full.names=TRUE)){
-  mymaf = read.maf(maf=maf_file)
-  maf_files = append(maf_files, mymaf)
-}
-
-merged_maf <- maftools::merge_mafs(maf_files)
-
-# Creating the patient and sample column for better annotation
-
-write.mafSummary(merged_maf, basename="merged_mafs_intersect_210923")
-```
-
-# Discard PCA117 PDO sample
-
-```{r}
-# Remove sample PCA117
-tsb = mymaf@clinical.data$Tumor_Sample_Barcode[-grep(mymaf@clinical.data$Tumor_Sample_Barcode, pattern="PCA117_*")]
-merged_maf_without_pca117 <- subsetMaf(merged_maf, tsb= tsb)
-write.mafSummary(merged_maf_without_pca117, basename="merged_mafs_intersect_noPCA117_210923")
-```
-
-# Loading MAF file
-```{r}
-#merged_maf <- read.maf("merged_mafs_190923_maftools.maf", 
-#                 verbose=TRUE)
-merged_maf <- read.maf("merged_mafs_220923_noPCA117_maftools.maf", 
+merged_maf <- read.maf("../results/combined_batches_wes/merged_mafs_allBatches_090124_maftools.maf", 
                  verbose=TRUE)
+
 merged_maf@clinical.data <- merged_maf@clinical.data %>%
   tidyr::separate(Tumor_Sample_Barcode, into = c("Patient", "Sample", "Treatment"), sep = "_", remove=FALSE) %>%
   dplyr::mutate(Sample_Label = stringr::str_extract(Sample, "[A-Za-z]+")) %>%
   data.table::setDT()
-
 tissue_samples <- merged_maf@clinical.data$Tumor_Sample_Barcode[grep(merged_maf@clinical.data$Tumor_Sample_Barcode, pattern="*TISSUE$")]
 organoid_samples <- merged_maf@clinical.data$Tumor_Sample_Barcode[-grep(merged_maf@clinical.data$Tumor_Sample_Barcode, pattern="*TISSUE$")]
 
 merged_maf_tissue_only <- subsetMaf(merged_maf, tsb= tissue_samples)
 merged_maf_organoid_only <- subsetMaf(merged_maf, tsb= organoid_samples)
-merged_maf@data$Tumor_Sample_Barcode
 merged_maf@data %>%
   dplyr::filter(Hugo_Symbol == "TP53")
 ```
@@ -99,14 +78,17 @@ merged_maf@data
 # Creating MAF summary plot
 ```{r}
 png(paste0(res_path,"/mafsummary.png"), units = "in", res = 300, width = 8, height = 10)
-plotmafSummary(maf = merged_maf, rmOutlier = TRUE, addStat = 'median', dashboard = TRUE, titvRacdw = FALSE)
+plotmafSummary(maf = merged_maf, rmOutlier = TRUE, addStat = 'median', dashboard = TRUE)
 dev.off()
 ```
 # Oncoplot 
 
 ```{r}
-# Setting up annotation colors
-patient_colors = RColorBrewer::brewer.pal(n = length(unique(merged_maf@clinical.data$Patient)),name = 'Spectral')
+n <- length(unique(merged_maf@clinical.data$Patient))
+qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
+col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+patient_colors <- sample(col_vector, n)
+#patient_colors = RColorBrewer::brewer.pal(n =n,name = 'Spectral')
 names(patient_colors) = unique(merged_maf@clinical.data$Patient)
 
 treatment_colors = RColorBrewer::brewer.pal(n = length(unique(merged_maf@clinical.data$Treatment)),name = 'Accent')
@@ -169,7 +151,7 @@ dev.off()
 # Lollipop Plot of specific genes
 ```{r}
 genes_lollipop <- c("TP53", "KRAS", "SMAD4", "CDKN2A", "ARID1A", "ATM", "TTN")
-lollipop_res <- "./r_analysis_pad50bp/lollipop/"
+lollipop_res <- res_path
 for (gene in genes_lollipop){
   png(paste0(lollipop_res,gene,"_lollipop.png"), units = "in", res = 300, width = 8, height = 6)
   lollipopPlot(
