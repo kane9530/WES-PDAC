@@ -1,12 +1,19 @@
 # wes-pdac-claire
 
 - [wes-pdac-claire](#wes-pdac-claire)
+- [Raw data](#raw-data)
 - [Directory organisation](#directory-organisation)
 - [Input files](#input-files)
 - [Method summary](#method-summary)
   - [Whole Exome sequencing and somatic variant calling {#sarekMethod}](#whole-exome-sequencing-and-somatic-variant-calling-sarekmethod)
   - [Identifyting copy number alterations](#identifyting-copy-number-alterations)
   - [HLA class I typing](#hla-class-i-typing)
+
+# Raw data
+WES Batch 1 : s3://claire-booney-052023-data
+WES Batch 1 processed data: s3://booney-wes-2
+WES Batch 2: s3://booney-wes-2
+RNAseq: s3://booney-rnaseq
 
 # Directory organisation
 
