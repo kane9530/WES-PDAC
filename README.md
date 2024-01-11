@@ -10,10 +10,15 @@
   - [HLA class I typing](#hla-class-i-typing)
 
 # Raw data
-WES Batch 1 : s3://claire-booney-052023-data
-WES Batch 1 processed data: s3://booney-wes-2
-WES Batch 2: s3://booney-wes-2
-RNAseq: s3://booney-rnaseq
+- WES Batch 1 : s3://claire-booney-052023-data
+
+- WES Batch 1 processed data: s3://booney-wes. **Note, the processed data for WES batch 1 is 
+not in biodebian due to space constraints, hence, processed data should be retrieved from the
+S3 bucket**.
+
+- WES Batch 2: s3://booney-wes-2
+
+- RNAseq: s3://booney-rnaseq
 
 # Directory organisation
 
