@@ -1,0 +1,16 @@
+97RT_CM-_vs_97RT_PBMC     175 PASS
+97RT_CM-_vs_97RT_PBMC      73 base_qual
+97RT_CM-_vs_97RT_PBMC     858 clustered_events
+97RT_CM-_vs_97RT_PBMC     180 contamination
+97RT_CM-_vs_97RT_PBMC      25 fragment
+97RT_CM-_vs_97RT_PBMC     761 germline
+97RT_CM-_vs_97RT_PBMC     780 haplotype
+97RT_CM-_vs_97RT_PBMC     170 map_qual
+97RT_CM-_vs_97RT_PBMC    1014 multiallelic
+97RT_CM-_vs_97RT_PBMC    2988 normal_artifact
+97RT_CM-_vs_97RT_PBMC     270 orientation
+97RT_CM-_vs_97RT_PBMC     846 panel_of_normals
+97RT_CM-_vs_97RT_PBMC       4 position
+97RT_CM-_vs_97RT_PBMC    1488 slippage
+97RT_CM-_vs_97RT_PBMC     831 strand_bias
+97RT_CM-_vs_97RT_PBMC    1773 weak_evidence

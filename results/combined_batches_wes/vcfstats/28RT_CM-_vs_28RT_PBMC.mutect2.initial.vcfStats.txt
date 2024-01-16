@@ -1,0 +1,16 @@
+28RT_CM-_vs_28RT_PBMC     147 PASS
+28RT_CM-_vs_28RT_PBMC     472 base_qual
+28RT_CM-_vs_28RT_PBMC     919 clustered_events
+28RT_CM-_vs_28RT_PBMC     379 contamination
+28RT_CM-_vs_28RT_PBMC      32 fragment
+28RT_CM-_vs_28RT_PBMC     827 germline
+28RT_CM-_vs_28RT_PBMC     848 haplotype
+28RT_CM-_vs_28RT_PBMC     133 map_qual
+28RT_CM-_vs_28RT_PBMC    1187 multiallelic
+28RT_CM-_vs_28RT_PBMC    3886 normal_artifact
+28RT_CM-_vs_28RT_PBMC     483 orientation
+28RT_CM-_vs_28RT_PBMC    1023 panel_of_normals
+28RT_CM-_vs_28RT_PBMC       2 position
+28RT_CM-_vs_28RT_PBMC    1868 slippage
+28RT_CM-_vs_28RT_PBMC    1086 strand_bias
+28RT_CM-_vs_28RT_PBMC    2399 weak_evidence

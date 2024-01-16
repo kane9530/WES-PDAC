@@ -1,0 +1,3 @@
+67RT_CM+_vs_67_PBMC      36 LowDepth
+67RT_CM+_vs_67_PBMC   20269 LowEVS
+67RT_CM+_vs_67_PBMC     393 PASS

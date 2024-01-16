@@ -1,0 +1,16 @@
+128RT_TISSUE_vs_128RT_PBMC     109 PASS
+128RT_TISSUE_vs_128RT_PBMC     413 base_qual
+128RT_TISSUE_vs_128RT_PBMC     572 clustered_events
+128RT_TISSUE_vs_128RT_PBMC     700 contamination
+128RT_TISSUE_vs_128RT_PBMC      34 fragment
+128RT_TISSUE_vs_128RT_PBMC     431 germline
+128RT_TISSUE_vs_128RT_PBMC     578 haplotype
+128RT_TISSUE_vs_128RT_PBMC      82 map_qual
+128RT_TISSUE_vs_128RT_PBMC     493 multiallelic
+128RT_TISSUE_vs_128RT_PBMC    2287 normal_artifact
+128RT_TISSUE_vs_128RT_PBMC     563 orientation
+128RT_TISSUE_vs_128RT_PBMC     439 panel_of_normals
+128RT_TISSUE_vs_128RT_PBMC       5 position
+128RT_TISSUE_vs_128RT_PBMC     874 slippage
+128RT_TISSUE_vs_128RT_PBMC    1004 strand_bias
+128RT_TISSUE_vs_128RT_PBMC    1876 weak_evidence
