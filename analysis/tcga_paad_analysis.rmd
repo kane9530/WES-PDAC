@@ -8,7 +8,7 @@ date: "2023-09-21"
 library(TCGAbiolinks)
 library(UpSetR)
 
-res_path <-"r_analysis_pad50bp/tcga/"
+res_path <- "../results/combined_batches_wes/"
 ```
 
 # TCGA 
@@ -45,7 +45,6 @@ tcga_paad_maf <- subsetMaf(tcga_paad_maf, tsb=remove_outlier_sample)
 
 ```{r}
 maftools_pdac = tcgaLoad(study = "PAAD")
-(maftools_pdac@variants.per.sample)
 tmb(maftools_pdac, logScale=FALSE)
 # Outlier sample has 14,176 variants!
 remove_outlier_sample <- maftools_pdac@clinical.data$Tumor_Sample_Barcode[maftools_pdac@clinical.data$Tumor_Sample_Barcode !=  "TCGA-IB-7651-01A-11D-2154-08"]
@@ -77,7 +76,7 @@ tmb(maftools_pdac, logScale=FALSE)
 
 # PDAC data
 ```{r}
-merged_maf <- read.maf("merged_mafs_intersect_noPCA117_210923_maftools.maf", 
+merged_maf <- read.maf(paste0(res_path, "merged_mafs_allBatches_160124_maftools.maf"),
                  verbose=TRUE)
 merged_maf@clinical.data <- merged_maf@clinical.data %>%
   tidyr::separate(Tumor_Sample_Barcode, into = c("Patient", "Sample", "Treatment"), sep = "_", remove=FALSE) %>%

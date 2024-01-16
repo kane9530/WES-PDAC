@@ -14,22 +14,50 @@ library(maftools)
 library(ComplexHeatmap)
 library(circlize)
 library(RColorBrewer)
-
-res_path <- "r_analysis_pad50bp/"
+res_path <- "../results/combined_batches_wes/"
 ```
 
 ```{r}
-mymaf <- read.maf("merged_mafs_220923_noPCA117_maftools.maf")
-mymaf@clinical.data <- mymaf@clinical.data %>%
+jaccard_dist = function(x, y) {
+	s = 1 - sum(x & y)/sum(x | y)
+	if(is.na(s)) {
+		return(1)
+	} else {
+		return(s)
+	}
+}
+
+hamming_dist <- function(x, y) {
+  if (length(x) != length(y)) {
+    stop("Vectors must be of the same length!")
+  }
+  
+  sum(x != y)
+}
+```
+
+```{r}
+merged_maf <-read.maf(paste0(res_path, "merged_mafs_allBatches_160124_maftools.maf"), 
+                 verbose=TRUE)
+# Load in metadata containing KRAS mutation information from sanger seuqencing
+metadata_wes <- readxl::read_excel("../metadata/metadata_all_samples.xlsx")
+
+# Cleaning the clinical data column to match with metadata spec
+merged_maf@clinical.data <- merged_maf@clinical.data %>%
   tidyr::separate(Tumor_Sample_Barcode, into = c("Patient", "Sample", "Treatment"), sep = "_", remove=FALSE) %>%
   dplyr::mutate(Sample_Label = stringr::str_extract(Sample, "[A-Za-z]+")) %>%
-  data.table::setDT()
+  dplyr::mutate(Sample_Clean = stringr::str_replace(Sample, "RT.*", "R")) %>%
+  data.table::setDT() 
+
+# Adding in metadata info
+merged_maf@clinical.data <- dplyr::left_join(merged_maf@clinical.data, metadata_wes, by=c("Sample_Clean" = "Label")) %>%
+  dplyr::rename(Stage = `Stage at diagnosis...10`)
 ```
 
 ```{r}
 # Extract metadata to add to heatmap
-patients<-mymaf@clinical.data$Patient
-sample_conditions <- mymaf@clinical.data$Treatment
+patients<-merged_maf@clinical.data$Patient
+sample_conditions <- merged_maf@clinical.data$Treatment
 
 # Create color palette
 patients_color_palette <- colorRampPalette(brewer.pal(8, "Dark2"))(length(unique(patients)))
@@ -47,13 +75,14 @@ names(df_conditions_color_mapping) <- mymaf@clinical.data$Tumor_Sample_Barcode
 # Create a data frame for the heatmap annotation
 annotation_df <- data.frame(patients = patients, conditions = sample_conditions)
 rownames(annotation_df) <- mymaf@clinical.data$Tumor_Sample_Barcode
+annotation_df <- annotation_df[colnames(heatmap_data),]
 ```
 
 ```{r}
 # Create a unique mutation identifier
-mutation_data <- mymaf@data %>% 
+mutation_data <- merged_maf@data %>% 
   mutate(unique_mutation = paste(Hugo_Symbol, HGVSp, sep = "_"))
-mymaf@data
+
 # Pivot to create a matrix suitable for clustering
 # We use the tidyr package's pivot_wider function to achieve this
 mutation_matrix <- mutation_data %>%
@@ -61,32 +90,17 @@ mutation_matrix <- mutation_data %>%
   dplyr::distinct() %>%
   dplyr::mutate(value = 1) %>% # Add a value column
   tidyr::pivot_wider(names_from = unique_mutation, values_from = value, values_fill = 0) # Pivot the data
+
 heatmap_data <- t(mutation_matrix[,-1])
 colnames(heatmap_data) <- mutation_matrix[, 1] %>% pull()
-
+heatmap_data
 #oncoplot(mymaf, writeMatrix=TRUE)
 # Define a color mapping for mutations
 col_fun <- c("0" = "black", "1" = "yellow")
 ```
 
 ```{r}
-set.seed(3)
-jaccard_dist = function(x, y) {
-	s = 1 - sum(x & y)/sum(x | y)
-	if(is.na(s)) {
-		return(1)
-	} else {
-		return(s)
-	}
-}
-
-hamming_dist <- function(x, y) {
-  if (length(x) != length(y)) {
-    stop("Vectors must be of the same length!")
-  }
-  
-  sum(x != y)
-}
+set.seed(1995)
 
 # Create the heatmap with unsupervised clustering
 ht <- Heatmap(heatmap_data, 
@@ -99,8 +113,8 @@ ht <- Heatmap(heatmap_data,
         column_names_gp = gpar(fontsize = 10),  # reduce column names font size
         cluster_columns = TRUE, # cluster samples
         column_title="Unsupervised clustering of PDO and patient tissue samples based on the SNPs and INDELs mutational landscape",
-        clustering_distance_columns=jaccard_dist,
-        column_km=6,
+        clustering_distance_columns="spearman",
+        column_km=17,
         show_heatmap_legend=TRUE,
         top_annotation = HeatmapAnnotation(df = annotation_df, col = list(patients = patients_color_mapping, conditions=conditions_color_mapping)))
 

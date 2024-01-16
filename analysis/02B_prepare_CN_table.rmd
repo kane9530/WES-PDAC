@@ -1,0 +1,290 @@
+---
+title: "02B_oncoplot_CN_ascat"
+output: html_document
+date: "2023-09-11"
+---
+
+The purpose of this notebook is to create the copy number table as input for maftools. 
+This requires extracting the 
+CN information for the mutated genes from ASCAT.
+
+```{r}
+library(stringr)
+library(tidyr)
+library(dplyr)
+library(readr)
+library(stringr)
+library(ggplot2)
+library(maftools)
+library(ConsensusClusterPlus)
+library(ComplexHeatmap)
+library(circlize)
+library(viridis)
+library(biomaRt)
+library(ArchR)
+
+res_path <- "../results/combined_batches_wes/"
+```
+
+# Prepare CN table
+
+```{r}
+add_sample_info <- function(file_path){
+  file <- readr::read_tsv(file_path, show_col_types = FALSE)
+  file <- file %>%
+    dplyr::mutate(sample_name = stringr::str_extract(basename(file_path), "^[^.]+")) %>%
+    dplyr::mutate(patient_id = str_extract(sample_name, "^[0-9]+"),
+         treatment = str_extract(sample_name, "(?<=_)[^_]+(?=_)"),
+         sample_label = case_when(
+          str_detect(sample_name, "^([0-9]+B)") ~ "B",
+          str_detect(sample_name, "^([0-9]+RT)") ~ "RT",
+          TRUE ~ "None"))
+  return(file)
+}
+
+# Modified function to read each file and convert WGD to numeric
+read_file <- function(file_path) {
+  # Try to read the file and handle any errors
+  tryCatch({
+    df <- read_delim(file_path, delim = "\t", escape_double = FALSE, col_types = cols(), trim_ws = TRUE)
+    
+    # Check if 'WGD' column exists and is of type character, then convert it to numeric
+    if ("WGD" %in% names(df) && is.character(df$WGD)) {
+      df$WGD <- as.numeric(df$WGD)
+    }
+
+    # Ensure the output is a data frame
+    if (!is.data.frame(df)) {
+      stop("The output is not a data frame.")
+    }
+
+    return(df)
+  }, error = function(e) {
+    message("Error reading file: ", file_path, "\nError: ", e$message)
+    return(NULL) # Return NULL if there's an error
+  })
+}
+
+# Read and combine all files
+combined_data <- map_dfr(metrics_paths, read_file, .id = "file_id")
+```
+
+```{r}
+# Listing file paths
+cnvs_paths <- list.files(paste0(res_path, "ascat/"),  full.names=TRUE, recursive=TRUE) %>%
+  grep(pattern="\\cnvs.txt$", value =TRUE)
+
+metrics_paths <- list.files(paste0(res_path, "ascat/"), full.names=TRUE, recursive=TRUE) %>%
+  grep(pattern="\\metrics.txt$", value =TRUE)
+
+purityploidy_paths <- list.files(paste0(res_path, "ascat/"), full.names=TRUE, recursive=TRUE) %>%
+  grep(pattern="\\purityploidy.txt$", value =TRUE)
+
+segments_paths <- list.files(paste0(res_path, "ascat/"), full.names=TRUE, recursive=TRUE) %>%
+  grep(pattern="\\ments.txt$", value =TRUE)
+segments_paths
+# Reading in dataframes
+cnvs <- purrr::map_dfr(cnvs_paths, add_sample_info)
+metrics <- purrr::map_dfr(metrics_paths,  read_file, .id = "file_id")
+purityploidy <- purrr::map_dfr(purityploidy_paths, add_sample_info)
+segments <- purrr::map_dfr(segments_paths, add_sample_info)
+```
+
+# Defining the CN categories
+```{r}
+# Create variables for TCN and segment size
+df <- segments %>%
+  dplyr::mutate(TCN = nMajor + nMinor,
+         segment_size_kb = (endpos - startpos) / 1000,
+         heterozygosity = case_when(
+           nMajor > 0 & nMinor > 0 ~ "heterozygous",
+           nMajor > 0 & nMinor == 0 ~ "LOH",
+           nMajor == 0 & nMinor > 0  ~ "LOH",
+           nMajor == 0 & nMinor == 0 ~ "homozygous deletion"
+         ),
+         TCN_category = case_when(
+           TCN == 0 ~ "homozygous deletion",
+           TCN == 1 ~ "deletion leading to LOH",
+           TCN == 2 ~ "wild type",
+           TCN %in% 3:4 ~ "minor gain",
+           TCN %in% 5:8 ~ "moderate gain",
+           TCN >= 9 ~ "high-level amplification"
+         ),
+         size_category = case_when(
+           segment_size_kb <= 100 ~ "0-100kb",
+           segment_size_kb > 100 & segment_size_kb <= 1000 ~ "100kb-1Mb",
+           segment_size_kb > 1000 & segment_size_kb <= 10000 ~ "1Mb-10Mb",
+           segment_size_kb > 10000 & segment_size_kb <= 40000 ~ "10Mb-40Mb",
+           segment_size_kb > 40000 ~ ">40Mb"
+         ))
+
+# Count occurrences of each combination of categories
+df_counts <- df %>%
+  dplyr::group_by(sample,heterozygosity, TCN_category, size_category) %>%
+  dplyr::summarize(n = n(), .groups = "drop")
+
+# Create complete set of all combinations of categories
+all_combinations <- expand_grid(sample = unique(df_counts$sample),
+  heterozygosity = c("heterozygous", "LOH", "homozygous deletion"),
+                                TCN_category = c("homozygous deletion",
+                                                 "deletion leading to LOH",
+                                                 "wild type",
+                                                 "minor gain",
+                                                 "moderate gain",
+                                                 "high-level amplification"),
+                                size_category = unique(df$size_category)) %>%
+  dplyr::filter(!(heterozygosity == "homozygous deletion" & TCN_category != "homozygous deletion" |
+                  heterozygosity == "LOH" & TCN_category == "homozygous deletion" |
+                  heterozygosity == "heterozygous" & TCN_category %in% c("homozygous deletion", 
+                                                                         "deletion leading to LOH")))
+
+
+# Join actual counts with all combinations
+df_final <- left_join(all_combinations, df_counts, by = c("heterozygosity", "TCN_category", "size_category", "sample"))
+
+df_final$n[is.na(df_final$n)] <- 0
+
+df_final <- df_final %>%
+  dplyr::mutate(TCN = case_when(
+           TCN_category == "homozygous deletion" ~ "0",
+           TCN_category == "deletion leading to LOH" ~ "1",
+           TCN_category == "wild type" ~ "2",
+           TCN_category == "minor gain" ~ "3-4",
+           TCN_category == "moderate gain"~ "5-8",
+           TCN_category == "high-level amplification" ~ "9"
+         ))%>%
+    dplyr::mutate(patient_id = str_extract(sample, "^[0-9]+"),
+         treatment = str_extract(sample, "(?<=_)[^_]+(?=_)"),
+         sample_label = case_when(
+          str_detect(sample, "^([0-9]+B)") ~ "B",
+          str_detect(sample, "^([0-9]+RT)") ~ "RT",
+          TRUE ~ "None"),
+         sample_name_clean = paste(patient_id, sample_label, treatment, sep="_"))
+```
+
+
+# Create granges object from CN categories file
+```{r}
+cn_granges <- makeGRangesFromDataFrame(df, start.field="startpos", end.field="endpos", keep.extra.columns=TRUE)
+```
+# Get coordinate information of mutated genes
+```{r}
+merged_maf <- read.maf("../results/combined_batches_wes/merged_mafs_allBatches_160124_maftools.maf", 
+                 verbose=TRUE)
+
+my_genes = getGeneSummary(merged_maf)$Hugo_Symbol
+m <- useMart('ensembl', dataset='hsapiens_gene_ensembl') # create a mart object
+my_genes_info<- getBM(mart=m, attributes=c('hgnc_symbol', 'description', 'chromosome_name',
+                                 'start_position', 'end_position', 'strand',
+                                 'ensembl_gene_id'),
+            filters='hgnc_symbol', values=my_genes) 
+
+my_genes_granges <-my_genes_info %>%
+  dplyr::mutate(strand_rename = ifelse(strand==-1, "-", ifelse(strand==1, "+", "*"))) %>%
+  dplyr::select(-strand) %>%
+  makeGRangesFromDataFrame(start.field="start_position",
+                                             end.field="end_position",
+                           strand.field="strand_rename",
+                                             keep.extra.columns = TRUE)
+merged_maf@clinical.data$Tumor_Sample_Barcode
+```
+# Find overlaps
+```{r}
+hits <- findOverlaps(cn_granges, my_genes_granges)
+```
+
+# Create new dataframe with the gene information
+
+```{r}
+process_hit <- function(hit){
+  # Extract the gene name 
+  overlapping_gene <- my_genes_info$hgnc_symbol[subjectHits(hit)]
+
+  # Extract the CN region
+  df_hit <- df[queryHits(hit), ]
+  
+  # Add a new column for overlapping gene
+  df_hit$Gene <- overlapping_gene
+  
+  return(df_hit)
+}
+# takes a while
+list_of_hits <- split(hits, seq_along(hits))
+result_df <- purrr::map_df(list_of_hits, process_hit)
+result_df_final <- result_df %>%
+  dplyr::mutate(CN = case_when(
+      grepl("deletion", TCN_category) ~ "Del",
+      grepl("minor gain", TCN_category) ~ "Gain",
+      grepl("moderate gain", TCN_category) ~ "Amp",
+      grepl("wild type", TCN_category) ~ "wild type",
+      TRUE ~ "NA" 
+  ))
+```
+
+# Create the CN table
+
+```{r}
+# Need to wrangle smaple_name to be same format as the merged_maf file
+CN_table <- result_df_final %>%
+  dplyr::mutate(sample_name_reformat = paste(paste0("PCA", patient_id),
+                                    paste0(patient_id, sample_label),
+                                    treatment,
+                                    sep="_")) %>%
+  dplyr::filter(CN != "wild type") %>%
+  dplyr::select(Gene, sample_name_reformat, CN)
+length(unique(CN_table$sample_name_reformat))
+CN_table
+# Strange issue with sample name from 63RT to 63RT3, hence update the CN table
+CN_table <- CN_table %>%
+  dplyr::mutate(sample_name_reformat = stringr::str_replace(sample_name_reformat, "63RT", "63RT3"))
+```
+
+```{r}
+data(cgc_67, package = "COSMIC.67")
+# Get cosmic genes
+cosmic_genes <- getGeneSummary(merged_maf)$Hugo_Symbol[getGeneSummary(merged_maf)$Hugo_Symbol %in% cgc_67$SYMBOL]
+
+# Data wrangling to remove samples from tissue + retain genes in COSMIC db only
+data_matrix_cosmic_noTissue <-  CN_table %>%
+  dplyr::filter(Gene %in% cosmic_genes) %>%
+  pivot_wider(names_from= sample_name_reformat, values_from= CN, values_fn = list, values_fill = list("Neutral")) %>%
+  tibble::column_to_rownames(var = "Gene") %>%
+  dplyr::select(-matches("TISSUE$")) %>%
+  as.matrix()
+
+data_matrix_cosmic_noTissue_simple <- matrix(sapply(data_matrix_cosmic_noTissue, `[[`, 1), nrow=nrow(data_matrix_cosmic_noTissue), ncol=ncol(data_matrix_cosmic_noTissue))
+rownames(data_matrix_cosmic_noTissue_simple) <- rownames(data_matrix_cosmic_noTissue)
+colnames(data_matrix_cosmic_noTissue_simple) <- colnames(data_matrix_cosmic_noTissue)
+
+#Create a color mapping for the CN alteration statuses
+cn_col_mapping <- c(
+  Amp = "#ca472f",
+  Gain = "#f6c85f",
+  Del = "#0b84a5",
+  Neutral = "#F5F5F5"
+)
+
+# Calculate the number of non-"neutral" entries for each row i.e. # samples per gene with a CNA
+neutral_count <- rowSums(data_matrix_cosmic_noTissue_simple != "Neutral")
+
+# Order the rows based on the number of non-neutral entries, with gene with highest CNA at top
+ordered_row_indices <- order(neutral_count, decreasing = TRUE)
+
+data_matrix_cosmic_noTissue_simple <- data_matrix_cosmic_noTissue_simple[ordered_row_indices, ]
+
+#  Create the heatmap using ComplexHeatmap
+png(paste0(res_path,"/complexheatmap_CN.png"), units = "in", res = 300, width = 12, height = 17)
+ComplexHeatmap::Heatmap(data_matrix_cosmic_noTissue_simple, 
+        name = "CN alterations", 
+        col = cn_col_mapping,
+        show_row_names = TRUE, 
+        show_column_names = TRUE, 
+        cluster_rows = FALSE, 
+        cluster_columns = TRUE,
+        row_names_gp = gpar(fontsize = 12),
+        column_names_gp = gpar(fontsize = 12),
+        rect_gp = gpar(col = "black", lwd = 0.2))
+dev.off()
+res_path
+```
+

@@ -1,0 +1,127 @@
+---
+title: "Untitled"
+output: html_document
+date: "2024-01-16"
+---
+
+```{r}
+library(stringr)
+library(tidyr)
+library(dplyr)
+library(readr)
+library(stringr)
+library(ggplot2)
+library(maftools)
+library(ConsensusClusterPlus)
+library(ComplexHeatmap)
+library(circlize)
+library(viridis)
+library(biomaRt)
+library(ArchR)
+
+res_path <- "../results/combined_batches_wes/"
+```
+
+# Load in maf file, pass in cnTable, and process
+
+```{r}
+merged_maf_cn <- read.maf("../results/combined_batches_wes/merged_mafs_allBatches_160124_maftools.maf",
+                  cnTable = CN_table,
+                  verbose=TRUE)
+
+# Load in metadata containing KRAS mutation information from sanger seuqencing
+metadata_wes <- readxl::read_excel("../metadata/metadata_all_samples.xlsx")
+
+# Cleaning the clinical data column to match with metadata spec
+merged_maf_cn@clinical.data <- merged_maf_cn@clinical.data %>%
+  tidyr::separate(Tumor_Sample_Barcode, into = c("Patient", "Sample", "Treatment"), sep = "_", remove=FALSE) %>%
+  dplyr::mutate(Sample_Label = stringr::str_extract(Sample, "[A-Za-z]+")) %>%
+  dplyr::mutate(Sample_Clean = stringr::str_replace(Sample, "RT.*", "R")) %>%
+  data.table::setDT() 
+
+# Adding in metadata info
+merged_maf_cn@clinical.data <- dplyr::left_join(merged_maf_cn@clinical.data, metadata_wes, by=c("Sample_Clean" = "Label")) %>%
+  dplyr::rename(Stage = `Stage at diagnosis...10`)
+
+tissue_samples <- merged_maf_cn@clinical.data$Tumor_Sample_Barcode[grep(merged_maf_cn@clinical.data$Tumor_Sample_Barcode, pattern="*TISSUE$")]
+organoid_samples <- merged_maf_cn@clinical.data$Tumor_Sample_Barcode[-grep(merged_maf_cn@clinical.data$Tumor_Sample_Barcode, pattern="*TISSUE$")]
+
+merged_maf_tissue_only <- subsetMaf(merged_maf_cn, tsb= tissue_samples)
+merged_maf_organoid_only <- subsetMaf(merged_maf_cn, tsb= organoid_samples)
+```
+
+# Setting up oncoplot colors
+
+```{r}
+# Setting up colors for variant classification 
+vc_cols = ArchR::ArchRPalettes$circus
+names(vc_cols) = c(
+  'Frame_Shift_Del',
+  'Missense_Mutation',
+  'Nonsense_Mutation',
+  'Multi_Hit',
+  'Frame_Shift_Ins',
+  'In_Frame_Ins',
+  'Splice_Site',
+  'In_Frame_Del',
+  'Del',
+  'Gain',
+  'Amp',
+  'Complex_Event'
+)
+vc_cn_cols <- c(
+  'Del',
+  'Gain',
+  'Amp'
+)
+
+# Setting up annotation colors for clinical features
+n_patients <- length(unique(merged_maf_cn@clinical.data$Patient))
+merged_maf_cn@clinical.data
+# Create a color ramp function based on the 'Spectral' palette
+spectral_ramp <- colorRampPalette(brewer.pal(11, "Spectral"))
+patient_colors <- spectral_ramp(n_patients)
+names(patient_colors) = unique(merged_maf_cn@clinical.data$Patient)
+
+treatment_colors = RColorBrewer::brewer.pal(n = length(unique(merged_maf_cn@clinical.data$Treatment)),name = 'Accent')
+names(treatment_colors) = unique(merged_maf_cn@clinical.data$Treatment)
+
+sample_label_colors = c("#F22B6E", "#82BAB9")
+names(sample_label_colors) = unique(merged_maf_cn@clinical.data$Sample_Label)
+
+stage_colors = RColorBrewer::brewer.pal(n = length(unique(merged_maf_cn@clinical.data$Stage)),name = 'Dark2')
+names(stage_colors) = unique(merged_maf_cn@clinical.data$Stage)
+
+anno_colors = list("Patient" = patient_colors,
+  "Treatment" = treatment_colors,
+  "Sample_Label" = sample_label_colors,
+  "Stage" = stage_colors)
+```
+
+Using TMB calculation without CN
+
+```{r}
+merged_maf <- read.maf("../results/combined_batches_wes/merged_mafs_allBatches_090124_maftools.maf", 
+                 verbose=TRUE)
+tmb_df <- tmb(maf = merged_maf, captureSize=  36.5, logScale=FALSE) %>%
+  dplyr::select(Tumor_Sample_Barcode, total_perMB) %>%
+  as.data.frame()
+```
+
+```{r}
+# Saving oncoplot
+png(paste0(res_path,"/oncoplot_CN.png"), units = "in", res = 300, width = 12, height = 18)
+oncoplot(maf = merged_maf_cn, colors=vc_cols, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, top = 50, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.6, writeMatrix=TRUE)
+dev.off()
+```
+
+CN oncoplot for cosmic genes only 
+
+```{r}
+data(cgc_67, package = "COSMIC.67")
+cosmic_genes <- getGeneSummary(merged_maf)$Hugo_Symbol[getGeneSummary(merged_maf)$Hugo_Symbol %in% cgc_67$SYMBOL]
+
+png(paste0(res_path,"/oncoplot_CN_cosmic.png"), units = "in", res = 300, width = 12, height = 17)
+oncoplot(maf = merged_maf_cn, colors=vc_cols, genes=cosmic_genes, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.5, writeMatrix=TRUE)
+dev.off()
+```

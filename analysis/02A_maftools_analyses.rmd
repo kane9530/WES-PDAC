@@ -1,0 +1,310 @@
+---
+title: "variant_annotation.rmd"
+output: html_document
+date: "2023-05-30"
+---
+
+```{r}
+library(RColorBrewer)
+library(maftools)
+library(ggplot2)
+library("BSgenome.Hsapiens.UCSC.hg38", quietly = TRUE)
+library('NMF')
+library(sigminer)
+library(VariantAnnotation)
+
+res_path <- "../results/combined_batches_wes/"
+```
+
+# Loading in MAF files
+
+```{r}
+maf_files = c()
+
+for (maf_file in list.files("/media/gedac/kane/projects/booney_wes_clean/results/first_batch_wes/maf",
+                            full.names=TRUE)){
+  mymaf = read.maf(maf=maf_file)
+  maf_files = append(maf_files, mymaf)
+}
+
+for (maf_file in list.files("/media/gedac/kane/projects/booney_wes_clean/results/second_batch_wes/maf",
+                            full.names=TRUE)){
+  mymaf = read.maf(maf=maf_file)
+  maf_files = append(maf_files, mymaf)
+}
+
+merged_maf <- maftools::merge_mafs(maf_files)
+
+# Saving maf file
+write.mafSummary(merged_maf, basename=paste0(res_path, "merged_mafs_allBatches_160124"))
+# Creating the patient and sample column for better annotation
+#write.mafSummary(merged_maf, basename="merged_mafs_190923")
+```
+
+# Discard PCA117 PDO sample
+
+```{r}
+clinicalData <- read.csv(paste0(res_path, "clinical_data_160124.csv"))
+merged_maf <- read.maf(paste0(res_path, "merged_mafs_allBatches_160124_maftools.maf"), 
+                 verbose=TRUE)
+
+tsb = merged_maf@clinical.data$Tumor_Sample_Barcode[-grep(merged_maf@clinical.data$Tumor_Sample_Barcode, pattern="PCA117_*")]
+merged_maf_without_pca117 <- subsetMaf(merged_maf, tsb= tsb)
+write.mafSummary(merged_maf_without_pca117, basename=paste0(res_path, "merged_mafs_160124_noPCA117"))
+```
+# Loading MAF file (full) and metadata
+
+```{r}
+merged_maf <- read.maf(paste0(res_path,"merged_mafs_allBatches_160124_maftools.maf"), 
+                 verbose=TRUE)
+
+# Load in metadata containing KRAS mutation information from sanger seuqencing
+metadata_wes <- readxl::read_excel("../metadata/metadata_all_samples.xlsx")
+
+# Cleaning the clinical data column to match with metadata spec
+merged_maf@clinical.data <- merged_maf@clinical.data %>%
+  tidyr::separate(Tumor_Sample_Barcode, into = c("Patient", "Sample", "Treatment"), sep = "_", remove=FALSE) %>%
+  dplyr::mutate(Sample_Label = stringr::str_extract(Sample, "[A-Za-z]+")) %>%
+  dplyr::mutate(Sample_Clean = stringr::str_replace(Sample, "RT.*", "R")) %>%
+  data.table::setDT()
+
+# Adding in metadata info
+merged_maf@clinical.data <- dplyr::left_join(merged_maf@clinical.data, metadata_wes, by=c("Sample_Clean" = "Label")) %>%
+  dplyr::rename(Stage = `Stage at diagnosis...10`)
+
+# Adding in metadata info
+merged_maf@clinical.data <- dplyr::left_join(merged_maf@clinical.data, metadata_wes, by=c("Sample_Clean" = "Label"))
+
+# Subsetting for tissue vs organoid samples
+tissue_samples <- merged_maf@clinical.data$Tumor_Sample_Barcode[grep(merged_maf@clinical.data$Tumor_Sample_Barcode, pattern="*TISSUE$")]
+organoid_samples <- merged_maf@clinical.data$Tumor_Sample_Barcode[-grep(merged_maf@clinical.data$Tumor_Sample_Barcode, pattern="*TISSUE$")]
+
+merged_maf_tissue_only <- subsetMaf(merged_maf, tsb= tissue_samples)
+merged_maf_organoid_only <- subsetMaf(merged_maf, tsb= organoid_samples)
+```
+
+#. Checking KRAS mutatioun status of samples 
+
+```{r}
+merged_maf@data %>% dplyr::filter(Hugo_Symbol == "KRAS") %>% 
+  dplyr::select(Tumor_Sample_Barcode, HGVSp_Short, t_ref_count, t_alt_count) %>%
+  tidyr::separate(Tumor_Sample_Barcode, into = c("Patient", "Sample", "Treatment"), sep = "_", remove=FALSE) %>%
+  dplyr::mutate(Sample_Label = stringr::str_extract(Sample, "[A-Za-z]+"))  %>%
+  dplyr::mutate(Sample_Clean = stringr::str_replace(Sample, "RT.*", "R")) 
+sanger_kras <- merged_maf@clinical.data %>%
+  dplyr::select(Sample_Clean, KRAS) %>%
+  dplyr::distinct() %>%
+  dplyr::mutate(Source = "Sanger") %>%
+  dplyr::add_row(Sample_Clean ="76B", KRAS="Absent", Source = "WES") %>% #Inserting in the absent mutations from WES
+  
+
+wes_kras <- merged_maf@data  %>% dplyr::filter(Hugo_Symbol == "KRAS") %>% 
+  dplyr::select(Tumor_Sample_Barcode, HGVSp_Short, t_ref_count, t_alt_count) %>%
+  tidyr::separate(Tumor_Sample_Barcode, into = c("Patient", "Sample", "Treatment"), sep = "_", remove=FALSE) %>%
+  dplyr::mutate(Sample_Label = stringr::str_extract(Sample, "[A-Za-z]+"))  %>%
+  dplyr::mutate(Sample_Clean = stringr::str_replace(Sample, "RT.*", "R")) %>%
+  dplyr::mutate(KRAS = str_replace(HGVSp_Short, "p.", "")) %>%
+  dplyr::mutate(Source ="WES") %>%
+  dplyr::select(Sample_Clean, KRAS, Source )  %>%
+  dplyr::distinct() %>%
+  dplyr::add_row(Sample_Clean ="123B", KRAS="WT", Source = "WES") %>% #If WT, not present in mutation data for WES
+  dplyr::add_row(Sample_Clean ="80B", KRAS="WT", Source = "WES") #If WT, not present in mutation data for WES
+
+kras_combined <- rbind(sanger_kras, wes_kras)
+kras_combined <- kras_combined %>%
+  dplyr::mutate(UniqueID = paste(Sample_Clean, KRAS, sep = "_")) %>% 
+  tidyr::complete(Source,UniqueID) %>%
+  dplyr::mutate(KRAS = ifelse(is.na(KRAS), "Absent", KRAS))
+
+# Number of distinct mutations (excluding NA)
+mutation_colors <- ArchR::paletteDiscrete(values = kras_combined$KRAS,set = "stallion", reverse = TRUE)
+mutation_colors["Absent"] <- "gray" 
+
+png(paste0(res_path,"/wes_sanger_comparison.png"), units = "in", res = 300, width = 8, height = 10)
+ggplot(kras_combined, aes(x = Source, y = UniqueID, fill = KRAS)) +
+  geom_tile() +
+  scale_fill_manual(values = mutation_colors) +
+  labs(x = "Source", y = "Sample_Mutation", fill = "Mutation") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 7))
+dev.o
+```
+
+# Exploring sample summary statistics
+```{r}
+getGeneSummary(merged_maf)
+merged_maf@gene.summary
+getFields(merged_maf)
+```
+
+# Creating MAF summary plot
+```{r}
+png(paste0(res_path,"/mafsummary.png"), units = "in", res = 300, width = 8, height = 10)
+plotmafSummary(maf = merged_maf, rmOutlier = TRUE, addStat = 'median', dashboard = TRUE)
+dev.off()
+```
+# Oncoplot 
+
+```{r}
+n <- length(unique(merged_maf@clinical.data$Patient))
+qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
+col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+patient_colors <- sample(col_vector, n)
+#patient_colors = RColorBrewer::brewer.pal(n =n,name = 'Spectral')
+names(patient_colors) = unique(merged_maf@clinical.data$Patient)
+
+treatment_colors = RColorBrewer::brewer.pal(n = length(unique(merged_maf@clinical.data$Treatment)),name = 'Accent')
+names(treatment_colors) = unique(merged_maf@clinical.data$Treatment)
+treatment_colors
+
+sample_label_colors = c("#F22B6E", "#82BAB9")
+names(sample_label_colors) = unique(merged_maf@clinical.data$Sample_Label)
+
+stage_colors = RColorBrewer::brewer.pal(n = length(unique(merged_maf_cn@clinical.data$Stage)),name = 'Dark2')
+names(stage_colors) = unique(merged_maf_cn@clinical.data$Stage)
+
+anno_colors = list("Patient" = patient_colors,
+  "Treatment" = treatment_colors,
+  "Sample_Label" = sample_label_colors,
+  "Stage" = stage_colors)
+```
+
+```{r}
+tmb_df <- tmb(maf = merged_maf, captureSize=  36.5, logScale=FALSE) %>%
+  dplyr::select(Tumor_Sample_Barcode, total_perMB) %>%
+  as.data.frame()
+```
+
+
+```{r}
+# Saving oncoplot - not that useful as there are many genes involved
+png(paste0(res_path,"/oncoplot_snp_indel.png"), units = "in", res = 300, width = 12, height = 17)
+oncoplot(maf = merged_maf, colors=vc_cols, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, top = 50, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.6, writeMatrix=TRUE)
+dev.off()
+
+```
+
+# Oncoplot of genes within COSMIC database
+
+```{r}
+data(cgc_67, package = "COSMIC.67")
+cosmic_genes <- getGeneSummary(merged_maf)$Hugo_Symbol[getGeneSummary(merged_maf)$Hugo_Symbol %in% cgc_67$SYMBOL]
+
+png(paste0(res_path,"/oncoplot_cosmic_snp_indel.png"), units = "in", res = 300, width = 12, height = 17)
+oncoplot(maf = merged_maf, colors=vc_cols, genes=cosmic_genes, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.5, writeMatrix=TRUE,
+         rightBarLims)
+dev.off()
+```
+
+# Calculate Tumor mutational burden (TMB) score alone
+```{r}
+# All PDO + Tissue
+png(paste0(res_path,"/tmb_pdac.png"), units = "in", res = 300, width = 12, height = 12)
+tmb(maf = merged_maf, captureSize=  36.5, logScale=FALSE)
+dev.off()
+
+# Tissue only
+png(paste0(res_path,"/tmb_tissueOnly.png"), units = "in", res = 300, width = 12, height = 12)
+tmb(maf=merged_maf_tissue_only, captureSize=36.5, logScale=FALSE)
+dev.off()
+
+# Organoid only
+png(paste0(res_path,"/tmb_OrganoidOnly.png"), units = "in", res = 300, width = 12, height = 12)
+tmb(maf=merged_maf_organoid_only, captureSize=36.5, logScale=FALSE)
+dev.off()
+
+```
+# Titv plot 
+```{r}
+merged_maf.titv = titv(maf = merged_maf, plot = FALSE, useSyn = FALSE)
+
+png(paste0(res_path,"/titv.png"), units = "in", res = 300, width = 12, height = 12)
+plotTiTv(res = merged_maf.titv, showBarcodes=TRUE, textSize=0.6, plotNotch=TRUE)
+dev.off()
+```
+
+
+# Lollipop Plot of specific genes
+```{r}
+genes_lollipop <- c("TP53", "KRAS", "SMAD4", "CDKN2A", "ARID1A", "ATM", "TTN")
+lollipop_res <- res_path
+for (gene in genes_lollipop){
+  png(paste0(lollipop_res,gene,"_lollipop.png"), units = "in", res = 300, width = 8, height = 6)
+  lollipopPlot(
+  maf = merged_maf,
+  labelPos="all",
+  gene = gene,
+  showMutationRate = TRUE)
+  dev.off()
+}
+
+merged_maf@data %>%
+  dplyr::filter(Hugo_Symbol == "KRAS") %>%
+  dplyr::select(HGVSp_Short) %>%
+  table()
+lollipopPlot(
+  maf = merged_maf,
+  labelPos="all",
+  gene = "KRAS",
+  showMutationRate = TRUE)
+```
+# plotVAF of key genes
+```{r}
+samples_data_tidy <- merged_maf@data %>%
+  tidyr::separate(Tumor_Sample_Barcode, into = c("Patient", "Sample", "Treatment"), sep = "_", remove=FALSE) %>%
+  dplyr::mutate(isTissue = ifelse(Treatment=="TISSUE","TISSUE","ORGANOID")) %>%
+  dplyr::mutate(vaf = t_alt_count/t_depth)
+samples_data_tidy_cosmic <- samples_data_tidy %>%
+  dplyr::filter(Hugo_Symbol %in% cosmic_genes[1:12])
+
+color_palette <- c("#08519C", "#3182BD", "#6BAED6", "#BDD7E7", "#FF0000")
+
+png(paste0(res_path,"/vaf.png"), units = "in", res = 300, width = 14, height = 10)
+ggplot(samples_data_tidy_cosmic, aes(x=Patient, y=vaf, fill=Treatment))+
+  geom_col(position="dodge")+
+  scale_fill_manual(values = color_palette) +
+  facet_wrap(~Hugo_Symbol) +
+  theme_minimal() +
+  theme(axis.text.x=element_text(angle=90))
+dev.off()
+
+```
+
+# Rainfall plot
+```{r}
+merged_maf@clinical.data
+rainfallPlot(maf = merged_maf,detectChangePoints = TRUE, pointSize = 0.4)
+```
+
+# Somatic interactions
+```{r}
+somaticInteractions(maf = merged_maf, top = 25, pvalue = c(0.05, 0.1))
+```
+
+# Oncodrive
+```{r}
+laml.sig = oncodrive(maf = merged_maf_cn, minMut = 5, pvalMethod = 'zscore')
+plotOncodrive(res = laml.sig, fdrCutOff = 0.1, useFraction = TRUE, labelSize = 0.3, bubbleSize=0.5)
+```
+
+# Oncogenic dysregualted pathways
+```{r}
+OncogenicPathways(maf = merged_maf)
+```
+# Plot specific oncogenic pathways
+```{r}
+PlotOncogenicPathways(maf = merged_maf, pathways = "TP53")
+```
+
+# Signatures
+```{r}
+laml.tnm = trinucleotideMatrix(maf = merged_maf,  ref_genome = "BSgenome.Hsapiens.UCSC.hg38")
+laml.sign = estimateSignatures(mat = laml.tnm, nTry = 20, pConstant=0.001)
+plotCophenetic(res = laml.sign)
+laml.sig = extractSignatures(mat = laml.tnm, n = 6, pConstant =0.001)
+laml.og30.cosm = compareSignatures(nmfRes = laml.sig, sig_db = "legacy")
+pheatmap::pheatmap(mat = laml.og30.cosm$cosine_similarities, cluster_rows = FALSE, main = "cosine similarity against validated signatures")
+maftools::plotSignatures(nmfRes = laml.sig, title_size = 1.2, sig_db = "SBS")
+getwd()
+```
