@@ -1,0 +1,16 @@
+96RT_T1_vs_96RT_PBMC     122 PASS
+96RT_T1_vs_96RT_PBMC     778 base_qual
+96RT_T1_vs_96RT_PBMC     779 clustered_events
+96RT_T1_vs_96RT_PBMC       1 contamination
+96RT_T1_vs_96RT_PBMC      19 fragment
+96RT_T1_vs_96RT_PBMC     817 germline
+96RT_T1_vs_96RT_PBMC     729 haplotype
+96RT_T1_vs_96RT_PBMC     119 map_qual
+96RT_T1_vs_96RT_PBMC    1093 multiallelic
+96RT_T1_vs_96RT_PBMC    3911 normal_artifact
+96RT_T1_vs_96RT_PBMC     778 orientation
+96RT_T1_vs_96RT_PBMC     944 panel_of_normals
+96RT_T1_vs_96RT_PBMC       4 position
+96RT_T1_vs_96RT_PBMC    1744 slippage
+96RT_T1_vs_96RT_PBMC    1472 strand_bias
+96RT_T1_vs_96RT_PBMC    2420 weak_evidence

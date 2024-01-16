@@ -1,0 +1,15 @@
+81B_T2_vs_81B_PBMC     143 PASS
+81B_T2_vs_81B_PBMC     339 base_qual
+81B_T2_vs_81B_PBMC     524 clustered_events
+81B_T2_vs_81B_PBMC      26 fragment
+81B_T2_vs_81B_PBMC     628 germline
+81B_T2_vs_81B_PBMC     531 haplotype
+81B_T2_vs_81B_PBMC     142 map_qual
+81B_T2_vs_81B_PBMC     809 multiallelic
+81B_T2_vs_81B_PBMC    2822 normal_artifact
+81B_T2_vs_81B_PBMC     605 orientation
+81B_T2_vs_81B_PBMC     694 panel_of_normals
+81B_T2_vs_81B_PBMC       3 position
+81B_T2_vs_81B_PBMC    1394 slippage
+81B_T2_vs_81B_PBMC     777 strand_bias
+81B_T2_vs_81B_PBMC    2070 weak_evidence

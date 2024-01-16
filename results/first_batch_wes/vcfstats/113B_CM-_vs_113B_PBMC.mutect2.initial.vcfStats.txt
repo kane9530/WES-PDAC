@@ -1,0 +1,16 @@
+113B_CM-_vs_113B_PBMC     166 PASS
+113B_CM-_vs_113B_PBMC     608 base_qual
+113B_CM-_vs_113B_PBMC     952 clustered_events
+113B_CM-_vs_113B_PBMC     655 contamination
+113B_CM-_vs_113B_PBMC      60 fragment
+113B_CM-_vs_113B_PBMC     790 germline
+113B_CM-_vs_113B_PBMC     925 haplotype
+113B_CM-_vs_113B_PBMC     161 map_qual
+113B_CM-_vs_113B_PBMC    1084 multiallelic
+113B_CM-_vs_113B_PBMC    3856 normal_artifact
+113B_CM-_vs_113B_PBMC     588 orientation
+113B_CM-_vs_113B_PBMC     962 panel_of_normals
+113B_CM-_vs_113B_PBMC       4 position
+113B_CM-_vs_113B_PBMC    1680 slippage
+113B_CM-_vs_113B_PBMC    1331 strand_bias
+113B_CM-_vs_113B_PBMC    2244 weak_evidence
