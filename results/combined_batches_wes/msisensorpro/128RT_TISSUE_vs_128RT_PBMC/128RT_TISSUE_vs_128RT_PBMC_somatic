@@ -1,0 +1,2 @@
+chromosome	location	left_flank_bases	repeat_times	repeat_unit_bases	right_flank_bases	difference	P_value	FDR	rank
+chr3	44774379	ATAAC	11	T	CTAGC	0.26956	2.1548e-06	0.027572	1
