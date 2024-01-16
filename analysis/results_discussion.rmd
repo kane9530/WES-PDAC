@@ -34,9 +34,7 @@ res_path_report="../results/combined_batches_wes/"
 
 # Methods
 
-## Analysis of whole Exome sequencing data {#sarekMethod}
-
-### SNP/Indels
+## Analysis of SNPS/INDELs in whole Exome sequencing data {#sarekMethod}
 
 The nf-core/sarek (v3.1.2) pipeline from the nf-core collection of workflows, which follows the GATK 
 best practices, was used to call short somatic variants (SNVs/INDELs) and copy number alterations (CNAs). The complete parameter
@@ -58,12 +56,12 @@ Mutational data from the TCGA_PAAD cohort was retrieved from maftools with the `
 with the tumor sample barcode of ‘TCGA-IB-7651-01” was excluded from the analysis as it has around two orders of magnitude more
 mutations identified than the rest of the samples, making it a clear outlier.
 
-### Copy number alterations
+## Copy number alterations
 
 ASCAT (v3.0.0) was used to detect copy number alterations in the 48 WES samples with tumor-normal pairs, by accounting for the admixture
 of non-neoplastic cells and tumor ploidy levels.
 
-### Microsatellite instability
+## Microsatellite instability
 
 MSIsensorpro (v1.2.0) was used to detect instances of microsatellite instability in the 48 WES samples with tumor-normal pairs.
 
@@ -87,7 +85,7 @@ shows the number of mutations retained for each caller per sample, whilst the bl
 of mutations called, with 500 and 501 SNPs/INDELs called for PCA35 and PCA80 respectively. In addition, we note that
 the PCA117_117B_CM- sample had a large number of SNPs/INDELs called. 
 
-```{r variantcallSummary, include=TRUE, fig.cap="Summary of filtering steps used in short "}
+```{r variantcallSummary, include=TRUE, fig.cap="Summary of filtering steps used in variant callers"}
 knitr::include_graphics(paste0(res_path_report, "vcfstats_combined_all.png"))
 ```
 
@@ -97,25 +95,25 @@ To provide external validation of the variants called in our PDAC_TISSUE dataset
 we compared our somatic variants and gene mutations against the corresponding public [TCGA_PAAD dataset](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5964983/).
 As shown in the upSet plot (Figure \@ref(fig:tcgaUpsetAll)), we found that around 26% of all mutated genes were shared between both datasets.
 Of the 111 mutated genes in our dataset that were also listed in the Catalogue of Somatic Mutations in Cancer (COSMIC) database  (Figure \@ref(fig:tcgaUpsetCosmic)),
-50 of them (31%) were also shared with the COSMIC genes in the TCGA dataset. Importantly, the co-oncoplots in Figure \@ref(fig:tcgaCoOncoplot) show that the known driver genes such as KRAS (67% TCGA vs 92% PDO/TISSUE), TP53 (62% TCGA and PDO/TISSUE), CDKN2A (21% TCGA and 26% PDO/TISSUE) and SMAD4 (21% TCGA and 20% PDO/TISSUE) driver gene mutations were recapitulated in our PDAC/TISSUE samples. On the other hand, our PDO/TISSUE samples have a greater proportion of ARID1A (5% TCGA and 32% PDO/TISSUE) and ATM (4% TCGA and 20% PDO/TISSUE) mutations. 
+50 of them (31%) were also shared with the COSMIC genes in the TCGA dataset. Importantly, focusing only on the mutations in the COSMIC database, the co-oncoplots in Figure \@ref(fig:tcgaCoOncoplot) show that the known driver genes such as KRAS (67% TCGA vs 92% PDO/TISSUE), TP53 (62% TCGA and PDO/TISSUE), CDKN2A (21% TCGA and 26% PDO/TISSUE) and SMAD4 (21% TCGA and 20% PDO/TISSUE) driver gene mutations were recapitulated in our PDAC/TISSUE samples. On the other hand, our PDO/TISSUE samples have a greater proportion of ARID1A (5% TCGA and 32% PDO/TISSUE) and ATM (4% TCGA and 20% PDO/TISSUE) mutations. 
 
 When we assessed the tumor mutational burden (TMB) estimates between the PDAC/TISSUE and TCGA datasets ( Figure \@ref(fig:tcgaCompareTmb) ), we find that our dataset has a higher median TMB score than the TCGA dataset (3.38MB: see `tmb_pdac.png`). Our 7 tissue samples are in the upper range of the TMB scores of the TCGA tissue samples (see `tcgaCompare_tmb_tissueOnly.png`) In conclusion, our somatic variant calling results are consistent with the TCGA_PAAD dataset in terms of the mutations, and have a higher tumor mutational burden than the TCGA samples. 
 
-```{r tcgaUpsetAll}
+```{r tcgaUpsetAll, fig.cap="Number of mutations found in TCGA vs PDAC/TISSUE data"}
 knitr::include_graphics(paste0(res_path_report, "tcga_upset_allGenes.png"))
 #1148/(1148+3198)
 #50/(50+108)
 ```
 
-```{r tcgaUpsetCosmic}
+```{r tcgaUpsetCosmic, fig.cap="Number of COSMIC mutations found in TCGA vs PDAC/TISSUE data"}
 knitr::include_graphics(paste0(res_path_report, "tcga_upset_cosmic_genes.png"))
 ```
 
-```{r tcgaCoOncoplot}
+```{r tcgaCoOncoplot, fig.cap="Co-oncoplot examining the proportion of TCGA or PDAC/TISSUE samples displaying the COSMIC mutations"}
 knitr::include_graphics(paste0(res_path_report, "tcga_co_oncoplot.png"))
 ```
 
-```{r tcgaCompareTmb}
+```{r tcgaCompareTmb, fig.cap="Comparing the TMB score between TCGA and PDAC/TISSUE data"}
 knitr::include_graphics(paste0(res_path_report, "tcgaCompare_tmb.png"))
 ```
 
@@ -134,7 +132,7 @@ In total, 14/17 (82%) samples have identical KRAS mutations identified by both W
 in 2 samples were concordant in both sequencing methods. 
 
 
-```{r wesSanger, include=TRUE}
+```{r wesSanger, include=TRUE, fig.cap="Assessing the concordance between the KRAS mutations identified by WES and Sanger Sequencing"}
 knitr::include_graphics(paste0(res_path_report, "wes_sanger_comparison.png"))
 ```
 
@@ -147,7 +145,7 @@ mutated genes that were also present in the COSMIC database, thus emphasising kn
 in carcinogenesis. 
 
 
-```{r oncoplotCosmic, include=TRUE}
+```{r oncoplotCosmic, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs in the COSMIC genes"}
 knitr::include_graphics(paste0(res_path_report, "oncoplot_cosmic_snp_indel.png"))
 ```
 
@@ -161,7 +159,7 @@ dissimilarity between the samples. We found that 3 of the tissue samples cluster
 with the corresponding PDO samples, whereas the remaining 4 of them had relatively fewer mutations and tended to
 cluster together with other samples with similarly lower TMB.
 
-```{r unsupervisedClustering, include=TRUE}
+```{r unsupervisedClustering, include=TRUE, fig.cap="Unsupervised clustering of PDO and tissue samples"}
 knitr::include_graphics(paste0(res_path_report, "unsupervised_clustering_snps_indels_shortName.png"))
 ```
 
@@ -171,11 +169,11 @@ We incorporated the CNA results into the oncoplot and display them in this repor
 one for the top 50 genes that are mutated in the PDO/TISSUE samples (Figure \@ref(fig:oncoplotCN)). Another oncoplot highlights all the COSMIC genes
 that are mutated in the samples (Figure \@ref(fig:oncoplotCNCosmic) ). The TMB score is indicated in the top panel (identical result to `tmb_pdac.png`).
 
-```{r oncoplotCN, include=TRUE}
+```{r oncoplotCN, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs and copy number alterations in the top 50 mutated genes"}
 knitr::include_graphics(paste0(res_path_report, "oncoplot_CN.png"))
 ```
 
-```{r oncoplotCNCosmic, include=TRUE}
+```{r oncoplotCNCosmic, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs and copy number alterations in the COSMIC genes"}
 knitr::include_graphics(paste0(res_path_report, "oncoplot_CN_cosmic.png"))
 ```
 
@@ -185,18 +183,18 @@ We find that the patient tissue samples have a lower TMB score relative to the
 PDOs, with a median of 2.05 mutations/MB (Figure \@ref(fig:TMBtissue) vs 3.45 mutations/MB \@ref(fig:TMBOrganoid)) in the 
 organoid samples.
 
-```{r TMBtissue, include=TRUE}
+```{r TMBtissue, include=TRUE, fig.cap="TMB scores in the tissue samples"}
 knitr::include_graphics(paste0(res_path_report, "tmb_tissueOnly.png"))
 ```
 
-```{r TMBOrganoid, include=TRUE}
+```{r TMBOrganoid, include=TRUE,  fig.cap="TMB scores in the PDOs"}
 knitr::include_graphics(paste0(res_path_report, "tmb_OrganoidOnly.png"))
 ```
 
-# Microsatellite instability
+## Microsatellite instability
 
 With the exception of 117B_CM-, all the other samples have very low levels of microsatellite instability (Figure \@ref(fig:msisensor)).
 
-```{r msisensor, include=TRUE}
+```{r msisensor, include=TRUE,  fig.cap="Msisensorpro results show low levels of microsatellite instabillity, with most samples have a score less than 1%"}
 knitr::include_graphics(paste0(res_path_report, "msisensor.png"))
 ```

@@ -47,6 +47,9 @@ write.mafSummary(merged_maf, basename=paste0(res_path, "merged_mafs_allBatches_1
 clinicalData <- read.csv(paste0(res_path, "clinical_data_160124.csv"))
 merged_maf <- read.maf(paste0(res_path, "merged_mafs_allBatches_160124_maftools.maf"), 
                  verbose=TRUE)
+merged_maf@data %>% dplyr::filter(Hugo_Symbol == "KRAS")  %>% dplyr::select(HGVSp_Short) %>% table()
+merged_maf@data %>% dplyr::filter(Hugo_Symbol == "TP53")  %>% dplyr::select(HGVSp_Short) %>% table()
+merged_maf@data %>% dplyr::filter(Hugo_Symbol == "TP53")  %>% dplyr::select(Tumor_Sample_Barcode, HGVSp_Short)
 
 tsb = merged_maf@clinical.data$Tumor_Sample_Barcode[-grep(merged_maf@clinical.data$Tumor_Sample_Barcode, pattern="PCA117_*")]
 merged_maf_without_pca117 <- subsetMaf(merged_maf, tsb= tsb)

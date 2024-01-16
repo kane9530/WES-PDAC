@@ -6,7 +6,7 @@ date: "2023-06-22"
 
 ```{r setup, include=FALSE}
 library(dplyr)
-res_path <- "./r_analysis"
+res_path <- "../results/combined_batches_wes/"
 
 ```
 

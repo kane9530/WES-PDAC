@@ -13,15 +13,15 @@ library(readr)
 library(ArchR)
 library(stringr)
 
+res_path <- "../results/combined_batches_wes/"
 ```
 
 ```{r}
 # Specify the directory where your text files are
-file_dir <- "results_wes_full_40samples_pad50bp/vcfstats" 
+file_dir <- "../results/combined_batches_wes/vcfstats" 
 
 # Get a list of all the .txt files in the directory
 file_list <- list.files(file_dir, pattern = "*.txt", full.names = TRUE, recursive=TRUE)
-file_list
 
 # Read in each file, add a "caller" column, and combine into one data frame
 df <- file_list %>%
@@ -38,12 +38,15 @@ df <- file_list %>%
     read.table(.x, header = FALSE, stringsAsFactors = FALSE) %>%
       dplyr::mutate(caller = caller, stage = stage)
   })
-df
 colnames(df) <- c("sample_name", "number", "filter_status", "caller", "stage")
 df <- df %>%
   dplyr::mutate(patient_id = paste0("PCA", stringr::str_extract(sample_name, "^[0-9]+")),
                 sample_name_prefix = str_split(sample_name, "_vs", simplify = TRUE)[,1],
                 sample_name_clean = paste(patient_id, sample_name_prefix, sep="_")) 
+```
+Load MAF file from 02A)
+```{r}
+mymaf <- read.maf(paste0(res_path,"merged_mafs_allBatches_160124_maftools.maf"), removeDuplicatedVariants=TRUE)
 ```
 
 Plot 1: Breakdown of each caller's filter category across samples
@@ -72,7 +75,7 @@ mutect2_breakdown <- mutect2_df %>%
   geom_text(data = sums_mutect2_initial, aes(y = number_group, label = number_group), vjust = -0.5)+
   theme_minimal() +
   theme(axis.text.x = element_text(angle=90)) +
-  scale_fill_manual(values = ArchR::paletteDiscrete(values = mymaf@variants.per.sample$Tumor_Sample_Barcode, 
+  scale_fill_manual(values = ArchR::paletteDiscrete(values = df$sample_name_clean, 
                                                      set = "stallion", 
                                                      reverse = FALSE)) +
   ggtitle("SNPs/INDELs categorised across Mutect2 filters")
@@ -84,16 +87,18 @@ strelka2_breakdown <- df %>%
   geom_text(data = sums_strelka2_initial, aes(y = number_group, label = number_group), vjust = -0.5)+
   theme_minimal() +
   theme(axis.text.x = element_text(angle=90), legend.position = "none") +
-  scale_fill_manual(values = ArchR::paletteDiscrete(values = mymaf@variants.per.sample$Tumor_Sample_Barcode, 
+  scale_fill_manual(values = ArchR::paletteDiscrete(values = df$sample_name_clean,
                                                      set = "stallion", 
                                                      reverse = FALSE))+
   scale_y_continuous(labels=scales::comma) +
   ggtitle("SNPs/INDELs categorised across Strelka2 filters")
 
-png("r_analysis_pad50bp/vcfstats/vcfstats_callers.png", res=300, units = "in", width = 20, height=10)
+png(paste0(res_path, "vcfstats_callers.png"), res=300, units = "in", width = 20, height=10)
 vcfstats_callers <- cowplot::plot_grid(mutect2_breakdown, strelka2_breakdown, nrow = 1, rel_widths = c(2,1))
 vcfstats_callers
 dev.off()
+
+unique(df$sample_name_clean)
 ```
 
 Plot 2: Number of variants passing the maxAF filter for each caller.
@@ -120,18 +125,14 @@ maxafimpact <- maxaf_impact_df %>%
   theme(axis.text.x = element_text(angle=90, size = 8)) +
   ggtitle("SNPs/INDELs after the maxAF filter")
 
-png("r_analysis_pad50bp/vcfstats/vcfstats_maxaf.png", res=300, units = "in", width = 10, height=10)
+png(paste0(res_path,"/vcfstats_maxaf.png"), res=300, units = "in", width = 10, height=10)
 maxafimpact
 dev.off()
 ```
 
 Plot 3: Final number of variants for each sample
 
-## A) Union + remove dups + remove silent mutations
-
 ```{r}
-mymaf <- read.maf("merged_mafs_310723_maftools.maf", removeDuplicatedVariants=TRUE)
-mymaf@maf.silent
 final_number_union <- mymaf@variants.per.sample %>%
   ggplot(aes(x= Tumor_Sample_Barcode, y=Variants, fill=Tumor_Sample_Barcode)) + 
   geom_bar(stat = "identity") +
@@ -142,39 +143,20 @@ final_number_union <- mymaf@variants.per.sample %>%
   scale_fill_manual(values = ArchR::paletteDiscrete(values = mymaf@variants.per.sample$Tumor_Sample_Barcode, set = "stallion", 
 reverse = FALSE))
 
-png("r_analysis_pad50bp/vcfstats/vcfstats_final_number_union.png", res=300, units = "in", width = 10, height=10)
+png(paste0(res_path, "vcfstats_final_number_union.png"), res=300, units = "in", width = 10, height=10)
 final_number_union
 dev.off()
 ```
 
-## B) Intersection + remove dups + remove silent mutations
-
-```{r}
-mymaf <- read.maf("merged_mafs_intersect_210923_maftools.maf", removeDuplicatedVariants=TRUE)
-mymaf@maf.silent
-final_number_intersect <- mymaf@variants.per.sample %>%
-  ggplot(aes(x= Tumor_Sample_Barcode, y=Variants, fill=Tumor_Sample_Barcode)) + 
-  geom_bar(stat = "identity") +
- geom_text(aes(label = Variants), vjust=-0.5) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle=90), legend.position = "none") +
-  ggtitle("Intersection of both callers and removal of silent variants") +
-  scale_fill_manual(values = ArchR::paletteDiscrete(values = mymaf@variants.per.sample$Tumor_Sample_Barcode, set = "stallion", 
-reverse = FALSE))
-
-png("r_analysis_pad50bp/vcfstats/vcfstats_final_number_intersect.png", res=300, units = "in", width = 10, height=10)
-final_number_intersect
-dev.off()
-```
 
 Combined plots
 
 ```{r}
 top_row =  cowplot::plot_grid(vcfstats_callers, labels=c("A"))
 mid_row = cowplot::plot_grid(maxafimpact, labels=c("B"))
-bottom_row = cowplot::plot_grid(final_number_union, final_number_intersect, labels=c("C", "D"))
+bottom_row = cowplot::plot_grid(final_number_union, labels=c("C"))
 
-png("r_analysis_pad50bp/vcfstats/vcfstats_combined_all.png", res=300, units = "in", width = 20, height=18)
+png(paste0(res_path, "vcfstats_combined_all.png"), res=300, units = "in", width = 20, height=18)
 cowplot::plot_grid(top_row, mid_row, bottom_row, nrow=3)
 dev.off()
 ```

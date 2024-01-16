@@ -99,14 +99,14 @@ merged_maf
 pdac_genes <- getGeneSummary(merged_maf)$Hugo_Symbol
 tcga_genes <- getGeneSummary(maftools_pdac)$Hugo_Symbol
 
-list_of_genes_all <- list(TCGA_PAAD = tcga_genes, PDO_TISSUE = pdac_genes)
+list_of_genes_all <- list(TCGA_PAAD = tcga_genes, "PDO/TISSUE" = pdac_genes)
 
 # Generate UpSet plot
 upset_all_genes <- upset(fromList(list_of_genes_all), order.by = "degree")
 shared_all_genes <- intersect(tcga_genes, pdac_genes)
 233/(233+387)
 
-png(paste0(res_path,"upset_allGenes.png"), units = "in", res = 300, width = 15, height = 12)
+png(paste0(res_path,"tcga_upset_allGenes.png"), units = "in", res = 300, width = 15, height = 12)
 upset_all_genes
 dev.off()
 ```
@@ -118,7 +118,7 @@ Around 15/26=57% of genes are shared.
 cosmic_genes<- getGeneSummary(merged_maf)$Hugo_Symbol[getGeneSummary(merged_maf)$Hugo_Symbol %in% cgc_67$SYMBOL]
 cosmic_genes_tcga <- getGeneSummary(maftools_pdac)$Hugo_Symbol[getGeneSummary(maftools_pdac)$Hugo_Symbol %in% cgc_67$SYMBOL]
 # Create a list of gene sets
-list_of_genes <- list(TCGA_PAAD = cosmic_genes_tcga, PDO_TISSUE = cosmic_genes)
+list_of_genes <- list(TCGA_PAAD = cosmic_genes_tcga, "PDO/TISSUE" = cosmic_genes)
 
 # Generate UpSet plot
 upset_cosmic_genes <- upset(fromList(list_of_genes), order.by = "degree")
@@ -126,7 +126,7 @@ upset_cosmic_genes <- upset(fromList(list_of_genes), order.by = "degree")
 shared_cosmic_genes <- intersect(cosmic_genes, cosmic_genes_tcga)
 15/26
 
-png(paste0(res_path,"upset_cosmic_genes.png"), units = "in", res = 300, width = 15, height = 12)
+png(paste0(res_path,"tcga_upset_cosmic_genes.png"), units = "in", res = 300, width = 15, height = 12)
 upset_cosmic_genes
 dev.off()
 ```
@@ -140,8 +140,8 @@ For the COSMIC genes that are shared between both studies, show the oncoplot sid
 cosmic_genes_tissue<- getGeneSummary(merged_maf_tissue_only)$Hugo_Symbol[getGeneSummary(merged_maf_tissue_only)$Hugo_Symbol %in% cgc_67$SYMBOL]
 shared_cosmic_genes_tissue <- intersect(cosmic_genes_tissue, cosmic_genes_tcga)
 
-png(paste0(res_path,"co_oncoplot.png"), units = "in", res = 300, width = 14, height = 8)
-coOncoplot(m1 = merged_maf, m2 = maftools_pdac, m1Name = 'PDO_TISSUE', m2Name = 'TCGA_PAAD', genes = shared_cosmic_genes, removeNonMutated = TRUE)
+png(paste0(res_path,"tcga_co_oncoplot.png"), units = "in", res = 300, width = 14, height = 8)
+coOncoplot(m1 = merged_maf, m2 = maftools_pdac, m1Name = 'PDO/TISSUE', m2Name = 'TCGA_PAAD', genes = shared_cosmic_genes, removeNonMutated = TRUE)
 dev.off()
 ```
 
