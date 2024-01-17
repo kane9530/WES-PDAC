@@ -1,0 +1,2 @@
+AberrantCellFraction	Ploidy
+0.99	1.8259055249541
