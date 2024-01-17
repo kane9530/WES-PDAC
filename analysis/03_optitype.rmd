@@ -6,6 +6,9 @@ date: "2023-06-22"
 
 ```{r setup, include=FALSE}
 library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(RColorBrewer)
 res_path <- "../results/combined_batches_wes/"
 
 ```
@@ -16,7 +19,7 @@ read_tsv_add_sample_name <- function(file) {
   data <- readr::read_tsv(file)
   
   # Extract the sample name for the file
-  sample_name <- stringr::str_extract(file, "(?<=/)[^/]+(?=/)")
+  sample_name <- stringr::str_extract(file,"[^/]+(?=_T1_result\\.tsv)")
   
   # Add the 'sample_name' column
   data <- dplyr::mutate(data, sample_name = sample_name)
@@ -35,31 +38,18 @@ jaccard <- function(x, y) {
 
 Importing optitype results.tsv files
 ```{r}
-dirs <- list.dirs(path = "haplotyping_full_40", recursive = TRUE, full.names = FALSE)
-num_dirs <- grep("^[0-9]", dirs, value = TRUE)
-path_to_dirs <- paste0("haplotyping_full_40/", num_dirs)
-
-# Get list of files in directories starting with numbers
-files <- purrr::map(path_to_dirs, list.files, recursive=TRUE, full.names = TRUE)
-tsv_files <- unlist(files)[grepl(".tsv$", unlist(files))]
-
-data <- purrr::map_df(tsv_files, read_tsv_add_sample_name)
+results_path <- list.files("../results/combined_batches_wes/hlatyping", recursive = TRUE, full.names = TRUE, pattern=".tsv")
+data <- purrr::map_dfr(results_path, read_tsv_add_sample_name)
 
 # Further process dataframe to add the approrpiate metadata columns
 data_processed <- data %>%
-  dplyr::mutate(patient_id = str_extract(sample_name, "^[0-9]+"),
-         treatment = str_extract(sample_name, "(?<=_)[^_]+(?=_)"),
+  dplyr::mutate(patient_id = stringr::str_extract(sample_name, "^[0-9]+"),
+         condition = stringr::str_extract(sample_name, "[A-Za-z0-9+-]+$"),
          sample_label = case_when(
-          str_detect(sample_name, "^([0-9]+B)") ~ "B",
-          str_detect(sample_name, "^([0-9]+RT)") ~ "RT",
+          stringr::str_detect(sample_name, "^([0-9]+B)") ~ "B",
+          stringr::str_detect(sample_name, "^([0-9]+RT)") ~ "RT",
           TRUE ~ "None"))
 ```
-Fix the mistake in the "67_RT_T2_T1" sample
-```{r}
-data_processed[21,]$treatment <- "T2"
-data_processed[21,]$sample_label <- "RT"
-```
-
 Computing pairwise jaccard index
 ```{r}
 # Compute pairwise Jaccard Index
@@ -80,7 +70,7 @@ Annotation information for pheatmap
 ```{r}
 # Extracting annotaiton information for pheatmap
 annotation_df <- data_processed %>% 
-  dplyr::select(sample_name, patient_id, treatment, sample_label ) %>% 
+  dplyr::select(sample_name, patient_id, condition, sample_label ) %>% 
   dplyr::distinct() %>% 
   dplyr::arrange(sample_name) %>% 
   tibble::column_to_rownames("sample_name")
@@ -91,15 +81,24 @@ annotation_df <- annotation_df[rownames(jaccard_matrix), ]
 
 # Convert character columns to factors for better color-coding
 annotation_df$patient_id <- factor(annotation_df$patient_id)
-annotation_df$treatment <- factor(annotation_df$treatment)
+annotation_df$condition <- factor(annotation_df$condition)
 annotation_df$sample_label <- factor(annotation_df$sample_label)
 
 # Define color palettes for annotations
-annotation_colors <- list(
-  patient_id = setNames(colorRampPalette(c("#FF0000", "#00FF00", "#0000FF"))(length(levels(annotation_df$patient_id))), levels(annotation_df$patient_id)),
-  treatment = setNames(colorRampPalette(c("#386cb0", "#f0027f", "#bf5b17"))(length(levels(annotation_df$treatment))), levels(annotation_df$treatment)),
-  sample_label = setNames(colorRampPalette(c("#66c2a5", "#fc8d62", "#8da0cb"))(length(levels(annotation_df$sample_label))), levels(annotation_df$sample_label))
-)
+patient_id_colors <-  ArchR::paletteDiscrete(values = annotation_df$patient_id,
+                                                     set = "stallion", 
+                                                     reverse = FALSE)
+condition_colors= ArchR::paletteDiscrete(values = annotation_df$condition,
+                                                     set = "kelly", 
+                                                     reverse = FALSE)
+sample_label_colors <- ArchR::paletteDiscrete(values = annotation_df$sample_label,
+                                                     set = "circus", 
+                                                     reverse = FALSE)
+
+
+annotation_colors <- list(patient_id = patient_id_colors,
+                          condition = condition_colors,
+                          sample_label = sample_label_colors)
 ```
 
 Plotting jaccaard similarity matrix
@@ -114,7 +113,8 @@ pheatmap::pheatmap(jaccard_matrix,
          annotation_row = annotation_df,
          annotation_colors = annotation_colors,
          legend_title = "Jaccard Index",
-         show_rownames = TRUE)
+         show_rownames = TRUE,
+         fontsize = 8)
 dev.off()
 ```
 
@@ -133,22 +133,22 @@ data_processed_hetero <- data_processed %>%
 ```{r}
 # Reshape the data to long format
 df_long <- data_processed_hetero %>%
-  select(A, B, C) %>%
-  pivot_longer(everything(), names_to = "allele_class", values_to = "heterozygosity")
+  dplyr::select(A, B, C) %>%
+  tidyr::pivot_longer(everything(), names_to = "allele_class", values_to = "heterozygosity")
 
 # Calculate proportions
 df_long <- df_long %>%
   group_by(allele_class) %>%
   summarise(heterozygosity_proportion = mean(heterozygosity)) %>%
   dplyr::mutate(homozygosity_proportion = 1 - heterozygosity_proportion) %>%
-  pivot_longer(cols =ends_with("proportion"), names_to="type", values_to="proportion")
+  tidyr::pivot_longer(cols =ends_with("proportion"), names_to="type", values_to="proportion")
 
 optitype_allele <- ggplot(df_long, aes(x = allele_class, y = proportion, fill = factor(type))) +
   geom_bar(stat = "identity", position = "fill") +
   scale_fill_manual(values = c("darkorange", "steelblue"), labels = c("Homozygous", "Heterozygous")) +
   labs(x = "HLA Class I", y = "Zygosity", fill ="Genotype") +
   theme_minimal()
-
+optitype_allele
 ```
 
 ```{r}
@@ -178,13 +178,13 @@ optitype_patient <- data_processed_hetero_bypatient %>%
 
 ```{r}
 data_processed_hetero_bytreatment <- data_processed_hetero %>%
-  dplyr::group_by(treatment) %>%
+  dplyr::group_by(condition) %>%
   dplyr::mutate(
     ave_A = mean(A),
     ave_B = mean(B),
     ave_C = mean(C)
   ) %>%
-  dplyr::select(treatment,  ave_A, ave_B, ave_C) %>%
+  dplyr::select(condition,  ave_A, ave_B, ave_C) %>%
   dplyr::distinct() %>%
   pivot_longer(cols=starts_with("ave"), names_to = "allele", values_to = "heterozygosity") %>%
   dplyr::mutate(homozygosity = 1 - heterozygosity) %>%
@@ -196,8 +196,10 @@ optitype_treatment <- data_processed_hetero_bytreatment %>%
   scale_fill_manual(values = c("darkorange", "steelblue"), labels = c("Heterozygous", "Homozygous")) +
   scale_x_discrete(labels = c("A", "B", "C"))+
   labs(x = "HLA Class I", y = "Zygosity", fill ="Genotype") +
-  facet_wrap(~treatment) +
+  facet_wrap(~condition) +
   theme_minimal()
+
+optitype_treatment
 ```
 
 Combine barplots

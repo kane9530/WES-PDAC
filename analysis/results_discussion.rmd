@@ -59,7 +59,14 @@ mutations identified than the rest of the samples, making it a clear outlier.
 ## Copy number alterations
 
 ASCAT (v3.0.0) was used to detect copy number alterations in the 48 WES samples with tumor-normal pairs, by accounting for the admixture
-of non-neoplastic cells and tumor ploidy levels.
+of non-neoplastic cells and tumor ploidy levels. 
+
+Our copy number profile summarisation follows the classification defined by Steele et al., (2022). We classified segments based on the sum of the major and minor alleles (TCN), and defined the CNAs as follows with slight modification from Steele for clarity:
+
+- Deletion: TCN=1
+- Gain: TCN=3-4 (equivalent to minor gain as defined by Steele and colleagues)
+- Amp: TCN=5-8 (equivalent to major gain as defined by Steele and colleagues)  
+- Wild type: TCN=2. 
 
 ## Microsatellite instability
 
@@ -93,9 +100,11 @@ knitr::include_graphics(paste0(res_path_report, "vcfstats_combined_all.png"))
 
 To provide external validation of the variants called in our PDAC_TISSUE dataset, 
 we compared our somatic variants and gene mutations against the corresponding public [TCGA_PAAD dataset](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5964983/).
-As shown in the upSet plot (Figure \@ref(fig:tcgaUpsetAll)), we found that around 26% of all mutated genes were shared between both datasets.
+As shown in the upSet plot (Figure \@ref(fig:tcgaUpsetAll)), we found that around 26% of all mutated genes were shared between both datasets. A gene is considered to be shared across both datasets if it is present in at least one sample in each study.
 Of the 111 mutated genes in our dataset that were also listed in the Catalogue of Somatic Mutations in Cancer (COSMIC) database  (Figure \@ref(fig:tcgaUpsetCosmic)),
-50 of them (31%) were also shared with the COSMIC genes in the TCGA dataset. Importantly, focusing only on the mutations in the COSMIC database, the co-oncoplots in Figure \@ref(fig:tcgaCoOncoplot) show that the known driver genes such as KRAS (67% TCGA vs 92% PDO/TISSUE), TP53 (62% TCGA and PDO/TISSUE), CDKN2A (21% TCGA and 26% PDO/TISSUE) and SMAD4 (21% TCGA and 20% PDO/TISSUE) driver gene mutations were recapitulated in our PDAC/TISSUE samples. On the other hand, our PDO/TISSUE samples have a greater proportion of ARID1A (5% TCGA and 32% PDO/TISSUE) and ATM (4% TCGA and 20% PDO/TISSUE) mutations. 
+50 of them (31%) were also shared with the COSMIC genes in the TCGA dataset.
+
+Importantly, focusing only on the mutations in the COSMIC database, the co-oncoplots in Figure \@ref(fig:tcgaCoOncoplot) show that the known driver genes such as KRAS (67% TCGA vs 92% PDO/TISSUE), TP53 (62% TCGA and PDO/TISSUE), CDKN2A (21% TCGA and 26% PDO/TISSUE) and SMAD4 (21% TCGA and 20% PDO/TISSUE) driver gene mutations were recapitulated in our PDAC/TISSUE samples. On the other hand, our PDO/TISSUE samples have a greater proportion of ARID1A (5% TCGA and 32% PDO/TISSUE) and ATM (4% TCGA and 20% PDO/TISSUE) mutations. 
 
 When we assessed the tumor mutational burden (TMB) estimates between the PDAC/TISSUE and TCGA datasets ( Figure \@ref(fig:tcgaCompareTmb) ), we find that our dataset has a higher median TMB score than the TCGA dataset (3.38MB: see `tmb_pdac.png`). Our 7 tissue samples are in the upper range of the TMB scores of the TCGA tissue samples (see `tcgaCompare_tmb_tissueOnly.png`) In conclusion, our somatic variant calling results are consistent with the TCGA_PAAD dataset in terms of the mutations, and have a higher tumor mutational burden than the TCGA samples. 
 
@@ -119,9 +128,27 @@ knitr::include_graphics(paste0(res_path_report, "tcgaCompare_tmb.png"))
 
 ## Somatic SNP/INDEL mutational landscape
 
-Across the PDAC samples, we observed that all samples possess the KRAS mutation.
-Of the 46 samples with the KRAS mutation, 24 samples (52%) exhibit G12V,  16 (35%)
-G12V and 5 G12R (11%). We validated our WES results with Sanger Sequencing at the KRAS loci. As shown in Figure \@ref(fig:wesSanger)), most of the
+The oncoplot shown in Figure \@ref(fig:oncoplotCosmic) shows the
+mutated genes that were also present in the COSMIC database,  emphasising known mutations with causal implications
+in carcinogenesis. Across the 50 PDAC samples, we observed that 46 samples (92%) possess the KRAS mutation . Of the 46 samples with the KRAS mutation, 24 samples (52%) exhibit G12V,  16 (35%) G12V and 5 G12R (11%). 
+62% of the samples have mutations in the TP53 gene, with each
+patient harboring a different mutation (See `TP53_lollipop.png` for the range of mutations displayed). Other genes that were mutated in relatively high proportion include the ARID1A (32%), ATM (20%), 
+CDKN2A (26%) and SMAD4 (20%) mutations.
+
+```{r oncoplotCosmic, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs in the COSMIC genes"}
+knitr::include_graphics(paste0(res_path_report, "oncoplot_cosmic_snp_indel.png"))
+```
+
+We find that the majority of mutations identified (2964) are unique to each patient, with only 1 gene shared across 11 (OR8U1), 12 (TP53) and 15 (KRAS) patients (Figure \@ref(fig:numMut)). This suggests that the mutational landscape is highly heterogeneous, with a few conserved driver genes tshared across distinct individuals.
+
+
+```{r numMut, include=TRUE, fig.cap="Barplots showing the number of mutations that are shared by patients"}
+knitr::include_graphics(paste0(res_path_report, "num_gene_category.png"))
+```
+
+## Validation of KRAS mutations with Sanger Sequencing
+
+We validated our WES results with Sanger Sequencing at the KRAS loci. As shown in Figure \@ref(fig:wesSanger)), most of the
 WES-identified KRAS mutations are identical to the Sanger Sequencing KRAS result, with the following exceptions:
 
 - An additional P34R mutation was identified in WES in the PCA76B sample.
@@ -131,23 +158,10 @@ WES-identified KRAS mutations are identical to the Sanger Sequencing KRAS result
 In total, 14/17 (82%) samples have identical KRAS mutations identified by both WES and Sanger sequencing. The KRAS wild-type alleles 
 in 2 samples were concordant in both sequencing methods. 
 
-
 ```{r wesSanger, include=TRUE, fig.cap="Assessing the concordance between the KRAS mutations identified by WES and Sanger Sequencing"}
 knitr::include_graphics(paste0(res_path_report, "wes_sanger_comparison.png"))
 ```
 
-62% of the samples have mutations in the TP53 gene, with each
-patient harboring a different mutation (See `TP53_lollipop.png` for the range of mutations displayed).
-
-Other genes that were mutated in relatively high proportion include the ARID1A (32%), ATM (20%), 
-CDKN2A (26%) and SMAD4 (20%) mutations. The oncoplot shown in Figure \@ref(fig:oncoplotCosmic) shows the
-mutated genes that were also present in the COSMIC database, thus emphasising known mutations with causal implications
-in carcinogenesis. 
-
-
-```{r oncoplotCosmic, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs in the COSMIC genes"}
-knitr::include_graphics(paste0(res_path_report, "oncoplot_cosmic_snp_indel.png"))
-```
 
 ## Unsupervised clustering of PDO and patient samples
 
@@ -167,7 +181,7 @@ knitr::include_graphics(paste0(res_path_report, "unsupervised_clustering_snps_in
 
 We incorporated the CNA results into the oncoplot and display them in this report. Two oncoplots are shown,
 one for the top 50 genes that are mutated in the PDO/TISSUE samples (Figure \@ref(fig:oncoplotCN)). Another oncoplot highlights all the COSMIC genes
-that are mutated in the samples (Figure \@ref(fig:oncoplotCNCosmic) ). The TMB score is indicated in the top panel (identical result to `tmb_pdac.png`).
+that are mutated in the samples (Figure \@ref(fig:oncoplotCNCosmic) ). The TMB score is indicated in the top panel (identical result to `tmb_pdac.png`). Further results from this analysis to explore can be found in the `ascat_cn_signatures` folder.
 
 ```{r oncoplotCN, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs and copy number alterations in the top 50 mutated genes"}
 knitr::include_graphics(paste0(res_path_report, "oncoplot_CN.png"))
@@ -197,4 +211,11 @@ With the exception of 117B_CM-, all the other samples have very low levels of mi
 
 ```{r msisensor, include=TRUE,  fig.cap="Msisensorpro results show low levels of microsatellite instabillity, with most samples have a score less than 1%"}
 knitr::include_graphics(paste0(res_path_report, "msisensor.png"))
+```
+## HLA typing result
+
+Based on the analysis of HLA class I alleles across various samples using the Jaccard similarity index, we note a notable correlation between the HLA class I allele profiles and their respective patient origins (Figure \@ref(fig:hlatyping)). This suggests that the HLA class I alleles are distinctively characteristic of individual patients. 
+
+```{r hlatyping, include=TRUE,  fig.cap="Clustering samples by the Jaccard similarity index by the predicted HLA class I alleles."}
+knitr::include_graphics(paste0(res_path_report, "optitype_jaccard.png"))
 ```

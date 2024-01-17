@@ -115,7 +115,7 @@ GI <-  ggplot(metrics, aes(x = sample_name, y = GI, fill = treatment)) +
   facet_wrap(~patient_id, scales = "free_x", labeller = as_labeller(function(x) paste0("PCA", x)))+
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 5))+
   ggtitle("Genomic Instability score")
-getwd()
+
 png("../results/combined_batches_wes/ascat_scores.png", res=300, units = "in", width = 15, height=15)
 cowplot::plot_grid(ploidy, purity, LOH, GI, labels="AUTO", nrow=2 )
 dev.off()
@@ -251,40 +251,16 @@ plot_81 <- plot_cn_signature(df_81, "81")
 plot_96 <- plot_cn_signature(df_96, "96")
 
 plots <- list(plot_113, plot_117, plot_128, plot_28, plot_67, plot_81, plot_96)
-for (i in 1:length(unique(df_final$patient_id))){
-  png(paste0("results/cn_signature_", unique(df_final$patient_id)[i], ".png"), res=300, units = "in", width = 7, height=7)
+patient_ids <- c("113", "117", "128", "28", "67", "81", "96")
+
+for (i in 1:length(plots)){
+  png(paste0("../results/combined_batches_wes/ascat_cn_signatures/cn_signature_", patient_ids[i], ".png"), res=300, units = "in", width = 7, height=7)
   print(plots[[i]])
   dev.off()
 }
+
 # Fix dimensions of plot for pca67 due to many samples
-png(paste0("results/cn_signatures/cn_signature_", unique(df_final$patient_id)[5], ".png"), res=300, units = "in", width = 15, height=10)
+png(paste0("../results/combined_batches_wes/ascat_cn_signatures/cn_signature_", patient_ids[5], ".png"), res=300, units = "in", width = 15, height=10)
 print(plots[[5]])
 dev.off()
-```
-
-```{r}
-mut_data <- mymaf@data %>%
-  dplyr::mutate(patient_id = str_extract(Tumor_Sample_Barcode, "^PCA[0-9]+"))
-  
-mut_data_summary <- mut_data %>%
-  dplyr::group_by(Hugo_Symbol) %>%
-  summarise(num_patients = n_distinct(patient_id)) %>%
-  arrange(desc(num_patients)) 
-
-count_data <- mut_data_summary %>%
-  group_by(num_patients) %>%
-  summarise(num_genes = n()) %>%
-  arrange(num_patients)
-
-png("results/num_gene_category.png", res=300, units = "in", width = 10, height=10)
-ggplot(count_data, aes(x = factor(num_patients), y = num_genes, fill = num_genes)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label=num_genes), vjust=-0.2) +
-  scale_fill_viridis() +
-  labs(x = "Number of patients with mutated gene (out of 7 patients)", y = "Number of genes") +
-  ggtitle("Number of genes for each category of patient count") + 
-  theme_minimal()
-dev.off()
-
-mymaf@variants.per.sample
 ```
