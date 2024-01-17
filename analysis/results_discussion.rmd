@@ -141,7 +141,6 @@ knitr::include_graphics(paste0(res_path_report, "oncoplot_cosmic_snp_indel.png")
 
 We find that the majority of mutations identified (2964) are unique to each patient, with only 1 gene shared across 11 (OR8U1), 12 (TP53) and 15 (KRAS) patients (Figure \@ref(fig:numMut)). This suggests that the mutational landscape is highly heterogeneous, with a few conserved driver genes tshared across distinct individuals.
 
-
 ```{r numMut, include=TRUE, fig.cap="Barplots showing the number of mutations that are shared by patients"}
 knitr::include_graphics(paste0(res_path_report, "num_gene_category.png"))
 ```
