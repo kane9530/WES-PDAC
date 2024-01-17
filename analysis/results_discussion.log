@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.2.22)  17 JAN 2024 03:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.2.22)  17 JAN 2024 03:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -492,12 +492,7 @@ LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 10
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [1
 
-{/home/kane/.TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Underfull \hbox (badness 10000) in paragraph at lines 143--145
-
- []
-
-[2]
+{/home/kane/.TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2]
 <../results/combined_batches_wes/vcfstats_combined_all.png, id=113, 1445.4pt x 1300.86pt>
 File: ../results/combined_batches_wes/vcfstats_combined_all.png Graphic file (type png)
 <use ../results/combined_batches_wes/vcfstats_combined_all.png>
@@ -600,7 +595,7 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  75i,11n,76p,630b,443s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/home/kane/.TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/home/kane/.TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}</home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on results_discussion.pdf (19 pages, 6025225 bytes).
+Output written on results_discussion.pdf (19 pages, 6025245 bytes).
 PDF statistics:
  300 PDF objects out of 1000 (max. 8388607)
  241 compressed objects within 3 object streams

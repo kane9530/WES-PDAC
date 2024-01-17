@@ -65,7 +65,7 @@ Our copy number profile summarisation follows the classification defined by Stee
 
 - Deletion: TCN=1
 - Gain: TCN=3-4 (equivalent to minor gain as defined by Steele and colleagues)
-- Amp: TCN=5-8 (equivalent to major gain as defined by Steele and colleagues) 
+- Amp: TCN=5-8 (equivalent to major gain as defined by Steele and colleagues)
 - Wild type: TCN=2. 
 
 ## Microsatellite instability
@@ -98,18 +98,18 @@ knitr::include_graphics(paste0(res_path_report, "vcfstats_combined_all.png"))
 
 ## Comparing against the TCGA PAAD dataset
 
-To provide external validation of the variants called in our PDAC_TISSUE dataset, 
-we compared our somatic variants and gene mutations against the corresponding public [TCGA_PAAD dataset](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5964983/).
-As shown in the upSet plot (Figure \@ref(fig:tcgaUpsetAll)), we found that around 26% of all mutated genes were shared between both datasets. A gene is considered to be shared across both datasets if it is present in at least one sample in each study.
-Of the 111 mutated genes in our dataset that were also listed in the Catalogue of Somatic Mutations in Cancer (COSMIC) database  (Figure \@ref(fig:tcgaUpsetCosmic)),
+We compared our somatic variants and gene mutations against the corresponding public [TCGA_PAAD dataset](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5964983/). Here, we examine
+the PDOs cultured in the CM- condition for all 17 patients. 
+
+As shown in the upSet plot (Figure \@ref(fig:tcgaUpsetAll)), we found that around 26% of all mutated genes were shared between both datasets. Of the 111 mutated genes in our dataset that were also listed in the Catalogue of Somatic Mutations in Cancer (COSMIC) database  (Figure \@ref(fig:tcgaUpsetCosmic)),
 50 of them (31%) were also shared with the COSMIC genes in the TCGA dataset.
 
-Importantly, focusing only on the mutations in the COSMIC database, the co-oncoplots in Figure \@ref(fig:tcgaCoOncoplot) show that the known driver genes such as KRAS (67% TCGA vs 92% PDO/TISSUE), TP53 (62% TCGA and PDO/TISSUE), CDKN2A (21% TCGA and 26% PDO/TISSUE) and SMAD4 (21% TCGA and 20% PDO/TISSUE) driver gene mutations were recapitulated in our PDAC/TISSUE samples. On the other hand, our PDO/TISSUE samples have a greater proportion of ARID1A (5% TCGA and 32% PDO/TISSUE) and ATM (4% TCGA and 20% PDO/TISSUE) mutations. 
+Importantly, focusing only on the mutations in the COSMIC database, the co-oncoplots in Figure \@ref(fig:tcgaCoOncoplot) show that the known driver genes such as KRAS (67% TCGA vs 94% CM-), TP53 (62% TCGA and 76% CM-), CDKN2A (21% TCGA and 35% CM-) and SMAD4 (21% TCGA and 29% CM-) driver gene mutations were recapitulated in our CM- PDO samples. On the other hand, our CM- samples have a greater proportion of ARID1A (5% TCGA and 24% CM-) and ATM (4% TCGA and 18% CM-) mutations. 
 
-When we assessed the tumor mutational burden (TMB) estimates between the PDAC/TISSUE and TCGA datasets ( Figure \@ref(fig:tcgaCompareTmb) ), we find that our dataset has a higher median TMB score than the TCGA dataset (3.38MB: see `tmb_pdac.png`). Our 7 tissue samples are in the upper range of the TMB scores of the TCGA tissue samples (see `tcgaCompare_tmb_tissueOnly.png`) In conclusion, our somatic variant calling results are consistent with the TCGA_PAAD dataset in terms of the mutations, and have a higher tumor mutational burden than the TCGA samples. 
+Next, we assessed the tumor mutational burden (TMB) estimates between all our 50 samples and the TCGA datasets ( Figure \@ref(fig:tcgaCompareTmb) ), we find that our dataset has a higher median TMB score than the TCGA dataset (3.38MB: see `tmb_pdac.png`). Our 7 tissue samples are in the upper range of the TMB scores of the TCGA tissue samples (see `tcgaCompare_tmb_tissueOnly.png`). 
 
 ```{r tcgaUpsetAll, fig.cap="Number of mutations found in TCGA vs PDAC/TISSUE data"}
-knitr::include_graphics(paste0(res_path_report, "tcga_upset_allGenes.png"))
+knitr::include_graphics(paste0(res_path_report, "tcga_upset_allGenes_CM-.png"))
 #1148/(1148+3198)
 #50/(50+108)
 ```
@@ -119,7 +119,7 @@ knitr::include_graphics(paste0(res_path_report, "tcga_upset_cosmic_genes.png"))
 ```
 
 ```{r tcgaCoOncoplot, fig.cap="Co-oncoplot examining the proportion of TCGA or PDAC/TISSUE samples displaying the COSMIC mutations"}
-knitr::include_graphics(paste0(res_path_report, "tcga_co_oncoplot.png"))
+knitr::include_graphics(paste0(res_path_report, "tcga_co_oncoplot_CM-.png"))
 ```
 
 ```{r tcgaCompareTmb, fig.cap="Comparing the TMB score between TCGA and PDAC/TISSUE data"}
@@ -128,7 +128,7 @@ knitr::include_graphics(paste0(res_path_report, "tcgaCompare_tmb.png"))
 
 ## Somatic SNP/INDEL mutational landscape
 
-The oncoplot shown in Figure \@ref(fig:oncoplotCosmic) shows the
+Here, we discuss the SNP/INDEL mutational landscape for our samples. The oncoplot shown in Figure \@ref(fig:oncoplotCosmic) shows the
 mutated genes that were also present in the COSMIC database,  emphasising known mutations with causal implications
 in carcinogenesis. Across the 50 PDAC samples, we observed that 46 samples (92%) possess the KRAS mutation . Of the 46 samples with the KRAS mutation, 24 samples (52%) exhibit G12V,  16 (35%) G12V and 5 G12R (11%). 
 62% of the samples have mutations in the TP53 gene, with each
@@ -139,7 +139,7 @@ CDKN2A (26%) and SMAD4 (20%) mutations.
 knitr::include_graphics(paste0(res_path_report, "oncoplot_cosmic_snp_indel.png"))
 ```
 
-We find that the majority of mutations identified (2964) are unique to each patient, with only 1 gene shared across 11 (OR8U1), 12 (TP53) and 15 (KRAS) patients (Figure \@ref(fig:numMut)). This suggests that the mutational landscape is highly heterogeneous, with a few conserved driver genes tshared across distinct individuals.
+We find that the majority of mutations identified (2964) are unique to each patient, with only 1 gene shared across 15 (KRAS),  12 (TP53) and 11 (OR8U1) patients (Figure \@ref(fig:numMut)). 3 (CHIT1, MUC5AC and TTN) genes are shared across 8 patients, 3 () This suggests that the mutational landscape is highly heterogeneous, with a few conserved driver genes tshared across distinct individuals.
 
 ```{r numMut, include=TRUE, fig.cap="Barplots showing the number of mutations that are shared by patients"}
 knitr::include_graphics(paste0(res_path_report, "num_gene_category.png"))
@@ -157,10 +157,19 @@ WES-identified KRAS mutations are identical to the Sanger Sequencing KRAS result
 In total, 14/17 (82%) samples have identical KRAS mutations identified by both WES and Sanger sequencing. The KRAS wild-type alleles 
 in 2 samples were concordant in both sequencing methods. 
 
+To double check that this is not a false positive call due to issues with the variant caller, we examined the reads at amino acid glycine codon 12 (specifically, position 25,245,350 on chromosome 12 in grch38) and amino acid proline at codon 34 (specifically, position 25,245,284 in chromosome 12 on grch38) in the KRAS gene in the integrated genome viewer (IGV) as these correspond to the discrepancies between both methods. For 76B_CM-, we note that of the 64 reads mapped to the site, around 59% show a transversion of G->C (see `igv_sanger_wes/76B_CM-.png`). For the other samples shown, almost all the reads at this site display the wild type allele. The reads are also mapped with high confidence. Thus, this supports the proline to arginine substitution for this sample. At codon 12, for 28RT_CM+, we find around 40% of the 108 reads indicate a C->A transition at position 25,245,350 and thus the codon GTT, supporting the G12V substitution (instead of the G12D substitution indicated by Sanger sequencing). See `igv_sanger_wes/4samples_wes.png`. Interestingly, for 71B_CM-, we found that there is a dinucleotide variation spanning from positions 25,245,350 and 25,245,351, such that all reads that carry a mutation also carry both substitutions at the same time  (see `igv_sanger_wes/dinucleotide_isoleucine.png`). Therefore, in fact, the mutation for codon 12 in 71B should be G12I (glycine to isoleucine) as the codon now reads ATT. WES mistakenly called two separate codon substitutions, as the variant caller did not consider whether nearby variants are part of the same haplotype. Thus, both the sanger and the original WES analysis did not pick up this rarer G12I substitution at first instance. This was ultimately picked up as this is the only patient whereby there are 2 separate substitutions identified at codon 12 of KRAS. In conclusion, the WES mutation calls are strongly supported by the mapped reads.
+
 ```{r wesSanger, include=TRUE, fig.cap="Assessing the concordance between the KRAS mutations identified by WES and Sanger Sequencing"}
 knitr::include_graphics(paste0(res_path_report, "wes_sanger_comparison.png"))
 ```
+## Note on TP53 mutations
 
+Whilst the KRAS gain of function mutations are prodominantly at codon 12 as expected,
+the TP53 inactivating mutations do not overlap between different patients. This is expected
+for loss of function inactivating mutations, as there are many more ways to inactivate the TP53
+protein than to lead to a gain of function for the KRAS protein. Importantly, all TP53 mutations 
+are shared within the PDOs and if present, the tissue sample, for each patient. See 
+`TP53_mutations_list.csv` for the full list of TP53 mutations called.
 
 ## Unsupervised clustering of PDO and patient samples
 
@@ -178,7 +187,7 @@ knitr::include_graphics(paste0(res_path_report, "unsupervised_clustering_snps_in
 
 ## Copy number alterations 
 
-We incorporated the CNA results into the oncoplot and display them in this report. Two oncoplots are shown,
+We incorporated the CNA results into the oncoplot and display them in this report. Note that CNA results are absent from 2 patients, PCA80 and PCA35 as they did not have matched blood samples for accurate copy number profile identification with ASCAT. Two oncoplots are shown,
 one for the top 50 genes that are mutated in the PDO/TISSUE samples (Figure \@ref(fig:oncoplotCN)). Another oncoplot highlights all the COSMIC genes
 that are mutated in the samples (Figure \@ref(fig:oncoplotCNCosmic) ). The TMB score is indicated in the top panel (identical result to `tmb_pdac.png`). Further results from this analysis to explore can be found in the `ascat_cn_signatures` folder.
 
@@ -188,6 +197,24 @@ knitr::include_graphics(paste0(res_path_report, "oncoplot_CN.png"))
 
 ```{r oncoplotCNCosmic, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs and copy number alterations in the COSMIC genes"}
 knitr::include_graphics(paste0(res_path_report, "oncoplot_CN_cosmic.png"))
+```
+
+## KRAS copy number alterations, grouped by condition
+
+We also assessed whether the CM- and T1 conditions lead to a greater proportion of samples possessing CNAs in the KRAS gene ((Figure \@ref(fig:cnaKRAScondition)). Of the 15 PDOs cultured in CM- (not including the PCA35_CM- and PCA80_CM- samples as they do not have a matched normal), we find that 10/15 have a gain in copy number for KRAS. For T1 treatment, 5/8 samples have a gain in copy number. For CM+ and T2, 3/9 samples have a gain in copy number.
+
+Comparing across the samples for each patient in Figure \@ref(fig:cnaKRAS), we make the following observations. First,
+samples that possess CNAs in the CM+ and T2 conditions also possess CNAs in the CM- and T1 conditions, however
+the converse is not the case. In addition, for PCA124B and PCA117B where samples were grown
+in both CM+ and CM- media, only the CM- condition led to CNA for KRAS. Both these observations suggest that 
+the CM- and T1 conditions likely encourage tumor outgrowth relative to the CM+ and T2 media conditions. In the PCA67_RT sample, we note that only the T1 treatment condition led to CNA. Also, several samples such as PCA28_RT and PCA113B did not have a CNA at the KRAS locus across all cultured media conditions. We also include a similar heatmap for the KRAS, TP53, SMAD4 and CDKN2A genes in `complexheatmap_CN_group_condition.png` plot. 
+
+```{r cnaKRAScondition, include=TRUE, fig.cap="CNA for KRAS, where samples are grouped according to culture media condition"}
+knitr::include_graphics(paste0(res_path_report, "complexheatmap_CN_group_condition_KRAS_only.png"))
+```
+
+```{r cnaKRAS, include=TRUE, fig.cap="CNA for KRAS, where samples are grouped by patient sample"}
+knitr::include_graphics(paste0(res_path_report, "complexheatmap_CN_KRAS_only.png"))
 ```
 
 ## Tumor mutational burden (TMB) score
