@@ -1,3 +1,0 @@
-71B_CM-_vs_71B_PBMC      43 LowDepth
-71B_CM-_vs_71B_PBMC   15570 LowEVS
-71B_CM-_vs_71B_PBMC     294 PASS

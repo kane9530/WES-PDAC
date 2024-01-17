@@ -1,3 +1,0 @@
-76B_CM-_vs_76B_PBMC      31 LowDepth
-76B_CM-_vs_76B_PBMC   14776 LowEVS
-76B_CM-_vs_76B_PBMC     336 PASS

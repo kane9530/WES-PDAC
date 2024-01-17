@@ -1,3 +1,0 @@
-92B_CM-_vs_92B_PBMC      28 LowDepth
-92B_CM-_vs_92B_PBMC   14994 LowEVS
-92B_CM-_vs_92B_PBMC     271 PASS

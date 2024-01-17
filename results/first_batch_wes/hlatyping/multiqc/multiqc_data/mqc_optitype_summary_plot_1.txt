@@ -1,0 +1,7 @@
+Sample	A*31:01	A*24:02	A*24:07	A*11:01	A*33:03	A*03:01	B*48:01	B*40:01	B*27:06	B*15:01	B*07:02	B*13:01	B*58:01	B*56:01	B*44:03	B*15:02	B*35:03	C*03:02	C*01:02	C*07:02	C*07:01	C*04:01	C*03:04	C*03:03	C*08:01
+A1	6.0	11.0	4.0	12.0	5.0	2.0	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan
+A2	nan	12.0	6.0	10.0	12.0	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan
+B1	nan	nan	nan	nan	nan	nan	6.0	11.0	6.0	10.0	2.0	5.0	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan
+B2	nan	nan	nan	nan	nan	nan	nan	nan	4.0	nan	nan	4.0	12.0	6.0	2.0	10.0	2.0	nan	nan	nan	nan	nan	nan	nan	nan
+C1	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	12.0	6.0	4.0	2.0	12.0	4.0	nan	nan
+C2	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	nan	13.0	nan	nan	11.0	6.0	10.0
