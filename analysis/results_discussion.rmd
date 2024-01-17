@@ -65,7 +65,7 @@ Our copy number profile summarisation follows the classification defined by Stee
 
 - Deletion: TCN=1
 - Gain: TCN=3-4 (equivalent to minor gain as defined by Steele and colleagues)
-- Amp: TCN=5-8 (equivalent to major gain as defined by Steele and colleagues)  
+- Amp: TCN=5-8 (equivalent to major gain as defined by Steele and colleagues) 
 - Wild type: TCN=2. 
 
 ## Microsatellite instability
