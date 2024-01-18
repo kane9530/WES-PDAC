@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.2.22)  18 JAN 2024 05:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.2.22)  18 JAN 2024 05:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -546,50 +546,50 @@ Package pdftex.def Info: ../results/combined_batches_wes/unsupervised_clustering
 <../results/combined_batches_wes/oncoplots_cn/oncoplot_cn_cm-.png, id=208, 867.24pt x 1228.59pt>
 File: ../results/combined_batches_wes/oncoplots_cn/oncoplot_cn_cm-.png Graphic file (type png)
 <use ../results/combined_batches_wes/oncoplots_cn/oncoplot_cn_cm-.png>
-Package pdftex.def Info: ../results/combined_batches_wes/oncoplots_cn/oncoplot_cn_cm-.png  used on input line 358.
+Package pdftex.def Info: ../results/combined_batches_wes/oncoplots_cn/oncoplot_cn_cm-.png  used on input line 359.
 (pdftex.def)             Requested size: 459.13217pt x 650.43723pt.
 
-LaTeX Warning: Float too large for page by 35.95164pt on input line 363.
+LaTeX Warning: Float too large for page by 35.95164pt on input line 364.
 
 [13 <../results/combined_batches_wes/unsupervised_clustering_snps_indels_shortName_COSMIC_onlyMatchedTissue.png (PNG copy)>] [14 <../results/combined_batches_wes/oncoplots_cn/oncoplot_cn_cm-.png (PNG copy)>]
 <../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png, id=225, 867.24pt x 1228.59pt>
 File: ../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png Graphic file (type png)
 <use ../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png>
-Package pdftex.def Info: ../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png  used on input line 378.
+Package pdftex.def Info: ../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png  used on input line 379.
 (pdftex.def)             Requested size: 459.13217pt x 650.43723pt.
 
-LaTeX Warning: Float too large for page by 23.95164pt on input line 383.
+LaTeX Warning: Float too large for page by 23.95164pt on input line 384.
 
 <../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png, id=226, 867.24pt x 1228.59pt>
 File: ../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png Graphic file (type png)
 <use ../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png>
-Package pdftex.def Info: ../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png  used on input line 387.
+Package pdftex.def Info: ../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png  used on input line 388.
 (pdftex.def)             Requested size: 459.13217pt x 650.43723pt.
 
-LaTeX Warning: Float too large for page by 23.95164pt on input line 392.
+LaTeX Warning: Float too large for page by 23.95164pt on input line 393.
 
 <../results/combined_batches_wes/tmb_tissueOnly.png, id=229, 867.24pt x 867.24pt>
 File: ../results/combined_batches_wes/tmb_tissueOnly.png Graphic file (type png)
 <use ../results/combined_batches_wes/tmb_tissueOnly.png>
-Package pdftex.def Info: ../results/combined_batches_wes/tmb_tissueOnly.png  used on input line 403.
+Package pdftex.def Info: ../results/combined_batches_wes/tmb_tissueOnly.png  used on input line 404.
 (pdftex.def)             Requested size: 469.75827pt x 469.75827pt.
 <../results/combined_batches_wes/tmb_OrganoidOnly.png, id=230, 867.24pt x 867.24pt>
 File: ../results/combined_batches_wes/tmb_OrganoidOnly.png Graphic file (type png)
 <use ../results/combined_batches_wes/tmb_OrganoidOnly.png>
-Package pdftex.def Info: ../results/combined_batches_wes/tmb_OrganoidOnly.png  used on input line 412.
+Package pdftex.def Info: ../results/combined_batches_wes/tmb_OrganoidOnly.png  used on input line 413.
 (pdftex.def)             Requested size: 469.75827pt x 469.75827pt.
 <../results/combined_batches_wes/msisensor.png, id=232, 867.24pt x 1300.86pt>
 File: ../results/combined_batches_wes/msisensor.png Graphic file (type png)
 <use ../results/combined_batches_wes/msisensor.png>
-Package pdftex.def Info: ../results/combined_batches_wes/msisensor.png  used on input line 426.
+Package pdftex.def Info: ../results/combined_batches_wes/msisensor.png  used on input line 427.
 (pdftex.def)             Requested size: 433.63217pt x 650.44826pt.
 
-LaTeX Warning: Float too large for page by 34.57825pt on input line 431.
+LaTeX Warning: Float too large for page by 34.57825pt on input line 432.
 
 <../results/combined_batches_wes/optitype_jaccard.png, id=234, 722.7pt x 650.43pt>
 File: ../results/combined_batches_wes/optitype_jaccard.png Graphic file (type png)
 <use ../results/combined_batches_wes/optitype_jaccard.png>
-Package pdftex.def Info: ../results/combined_batches_wes/optitype_jaccard.png  used on input line 440.
+Package pdftex.def Info: ../results/combined_batches_wes/optitype_jaccard.png  used on input line 441.
 (pdftex.def)             Requested size: 469.76045pt x 422.78441pt.
 [15] [16 <../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png (PNG copy)>] [17 <../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png (PNG copy)>] [18 <../results/combined_batches_wes/tmb_tissueOnly.png (PNG copy)>] [19 <../results/combined_batches_wes/tmb_OrganoidOnly.png (PNG copy)>] [20 <../results/combined_batches_wes/msisensor.png (PNG copy)>] [21 <../results/combined_batches_wes/optitype_jaccard.png (PNG copy)>] (./results_discussion.aux)
 Package rerunfilecheck Info: File `results_discussion.out' has not changed.
@@ -604,7 +604,7 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  75i,11n,76p,1826b,441s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/home/kane/.TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/home/kane/.TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}</home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on results_discussion.pdf (21 pages, 5464632 bytes).
+Output written on results_discussion.pdf (21 pages, 5464721 bytes).
 PDF statistics:
  335 PDF objects out of 1000 (max. 8388607)
  273 compressed objects within 3 object streams

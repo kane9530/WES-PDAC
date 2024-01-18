@@ -204,7 +204,8 @@ knitr::include_graphics(paste0(res_path_report, "unsupervised_clustering_snps_in
 
 ## Copy number alterations 
 
-We incorporated the CNA results into the oncoplot and display them in this report. Similar to the oncoplots containing only the SNPs/INDELs,  Note that CNA results are absent from 2 patients, PCA80 and PCA35 as they did not have matched blood samples for accurate copy number profile identification with ASCAT. The oncoplot for all CM- samples are shown in ((Figure \@ref(fig:oncoplotCNCosmic)). Further figures can be found in the `oncoplots_cn` folder. The TMB score is indicated in the top panel (identical to `tmb_pdac.png`). Further results from this analysis to explore can be found in the `ascat_cn_signatures` folder.
+We incorporated the CNA results into the oncoplot and display them in this report. Similar to the oncoplots containing only the SNPs/INDELs,  Note that CNA results are absent from 2 patients, PCA80 and PCA35 as they did not have matched blood samples for accurate copy number profile identification with ASCAT. The oncoplot for all CM- samples are shown in ((Figure \@ref(fig:oncoplotCNCosmic)). Further figures can be found in the `oncoplots_cn` folder. The TMB score is indicated in the top panel (identical to `tmb_pdac.png`). Further results from this analysis to explore can be found in the `ascat_cn_signatures` folder. Ploidy and purity estimates for 
+samples are shown in the plots `purity.png` and `ploidy.png`.
 
 ```{r oncoplotCNCosmic, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs and copy number alterations in the COSMIC genes for the CM- samples"}
 knitr::include_graphics(paste0(res_path_report, "oncoplots_cn/oncoplot_cn_cm-.png"))

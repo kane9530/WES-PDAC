@@ -119,6 +119,14 @@ GI <-  ggplot(metrics, aes(x = sample_name, y = GI, fill = treatment)) +
 png("../results/combined_batches_wes/ascat_scores.png", res=300, units = "in", width = 15, height=15)
 cowplot::plot_grid(ploidy, purity, LOH, GI, labels="AUTO", nrow=2 )
 dev.off()
+
+png("../results/combined_batches_wes/ploidy.png", res=300, units = "in", width = 15, height=15)
+ploidy
+dev.off()
+
+png("../results/combined_batches_wes/purity.png", res=300, units = "in", width = 15, height=15)
+purity
+dev.off()
 ```
 
 # Construct copy number profile summarisation following Steele et al., (2022)
