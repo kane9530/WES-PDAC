@@ -10,6 +10,7 @@ CN information for the mutated genes from ASCAT.
 
 ```{r}
 library(stringr)
+library(purrr)
 library(tidyr)
 library(dplyr)
 library(readr)
@@ -64,9 +65,6 @@ read_file <- function(file_path) {
     return(NULL) # Return NULL if there's an error
   })
 }
-
-# Read and combine all files
-combined_data <- map_dfr(metrics_paths, read_file, .id = "file_id")
 ```
 
 ```{r}
@@ -161,8 +159,6 @@ df_final <- df_final %>%
           TRUE ~ "None"),
          sample_name_clean = paste(patient_id, sample_label, treatment, sep="_"))
 ```
-
-
 # Create granges object from CN categories file
 ```{r}
 cn_granges <- makeGRangesFromDataFrame(df, start.field="startpos", end.field="endpos", keep.extra.columns=TRUE)
@@ -186,7 +182,6 @@ my_genes_granges <-my_genes_info %>%
                                              end.field="end_position",
                            strand.field="strand_rename",
                                              keep.extra.columns = TRUE)
-merged_maf@clinical.data$Tumor_Sample_Barcode
 ```
 # Find overlaps
 ```{r}
@@ -210,7 +205,9 @@ process_hit <- function(hit){
 }
 # takes a while
 list_of_hits <- split(hits, seq_along(hits))
+# takes a while too
 result_df <- purrr::map_df(list_of_hits, process_hit)
+
 result_df_final <- result_df %>%
   dplyr::mutate(CN = case_when(
       grepl("deletion", TCN_category) ~ "Del",
@@ -252,6 +249,8 @@ data_matrix_cosmic_noTissue <-  CN_table %>%
   dplyr::select(-matches("TISSUE$")) %>%
   as.matrix()
 
+CN_table
+
 data_matrix_cosmic_noTissue_simple <- matrix(sapply(data_matrix_cosmic_noTissue, `[[`, 1), nrow=nrow(data_matrix_cosmic_noTissue), ncol=ncol(data_matrix_cosmic_noTissue))
 rownames(data_matrix_cosmic_noTissue_simple) <- rownames(data_matrix_cosmic_noTissue)
 colnames(data_matrix_cosmic_noTissue_simple) <- colnames(data_matrix_cosmic_noTissue)
@@ -268,13 +267,26 @@ cn_col_mapping <- c(
 neutral_count <- rowSums(data_matrix_cosmic_noTissue_simple != "Neutral")
 
 # Order the rows based on the number of non-neutral entries, with gene with highest CNA at top
-ordered_row_indices <- order(neutral_count, decreasing = TRUE)
+#ordered_row_indices <- order(neutral_count, decreasing = TRUE)
+#data_matrix_cosmic_noTissue_simple <- data_matrix_cosmic_noTissue_simple[ordered_row_indices, ]
+```
 
-data_matrix_cosmic_noTissue_simple <- data_matrix_cosmic_noTissue_simple[ordered_row_indices, ]
+# Group samples by condition
+```{r}
+cm_neg_samples <- grep(colnames(data_matrix_cosmic_noTissue_simple),pattern="CM-", value=TRUE)
+t1_samples <- grep(colnames(data_matrix_cosmic_noTissue_simple),pattern="T1", value=TRUE)
+cm_pos_samples <- grep(colnames(data_matrix_cosmic_noTissue_simple),pattern="CM\\+", value=TRUE)
+t2_samples <- grep(colnames(data_matrix_cosmic_noTissue_simple),pattern="T2", value=TRUE)
+
+data_matrix_cosmic_noTissue_simple_fewGenesOnly <- data_matrix_cosmic_noTissue_simple[c("KRAS", "TP53", "SMAD4", "CDKN2A", "ATM"),c(cm_neg_samples, t1_samples, cm_pos_samples, t2_samples)]
+
+data_matrix_cosmic_noTissue_simple_KRAS_only <- data_matrix_cosmic_noTissue_simple[c("KRAS"),c(cm_neg_samples, t1_samples, cm_pos_samples, t2_samples)]
+
+data_matrix_cosmic_noTissue_simple_KRAS_only_normalOrder <- data_matrix_cosmic_noTissue_simple[c("KRAS"),]
 
 #  Create the heatmap using ComplexHeatmap
-png(paste0(res_path,"/complexheatmap_CN.png"), units = "in", res = 300, width = 12, height = 17)
-ComplexHeatmap::Heatmap(data_matrix_cosmic_noTissue_simple, 
+png(paste0(res_path,"/complexheatmap_CN_group_condition.png"), units = "in", res = 300, width = 12, height = 17)
+ComplexHeatmap::Heatmap(data_matrix_cosmic_noTissue_simple_fewGenesOnly, 
         name = "CN alterations", 
         col = cn_col_mapping,
         show_row_names = TRUE, 
@@ -285,6 +297,32 @@ ComplexHeatmap::Heatmap(data_matrix_cosmic_noTissue_simple,
         column_names_gp = gpar(fontsize = 12),
         rect_gp = gpar(col = "black", lwd = 0.2))
 dev.off()
-res_path
+
+#  Create the heatmap using ComplexHeatmap
+png(paste0(res_path,"/complexheatmap_CN_group_condition_KRAS_only.png"), units = "in", res = 300, width = 12, height = 17)
+ComplexHeatmap::Heatmap(data_matrix_cosmic_noTissue_simple_KRAS_only, 
+        name = "CN alterations", 
+        col = cn_col_mapping,
+        show_row_names = TRUE, 
+        show_column_names = TRUE, 
+        cluster_rows = FALSE, 
+        cluster_columns = TRUE,
+        row_names_gp = gpar(fontsize = 12),
+        column_names_gp = gpar(fontsize = 12),
+        rect_gp = gpar(col = "black", lwd = 0.2))
+dev.off()
+
+png(paste0(res_path,"/complexheatmap_CN_KRAS_only.png"), units = "in", res = 300, width = 12, height = 17)
+ComplexHeatmap::Heatmap(data_matrix_cosmic_noTissue_simple_KRAS_only_normalOrder, 
+        name = "CN alterations", 
+        col = cn_col_mapping,
+        show_row_names = TRUE, 
+        show_column_names = TRUE, 
+        cluster_rows = FALSE, 
+        cluster_columns = TRUE,
+        row_names_gp = gpar(fontsize = 12),
+        column_names_gp = gpar(fontsize = 12),
+        rect_gp = gpar(col = "black", lwd = 0.2))
+dev.off()
 ```
 

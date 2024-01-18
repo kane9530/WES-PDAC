@@ -97,31 +97,130 @@ anno_colors = list("Patient" = patient_colors,
   "Sample_Label" = sample_label_colors,
   "Stage" = stage_colors)
 ```
-
-Using TMB calculation without CN
-
-```{r}
-merged_maf <- read.maf("../results/combined_batches_wes/merged_mafs_allBatches_090124_maftools.maf", 
-                 verbose=TRUE)
-tmb_df <- tmb(maf = merged_maf, captureSize=  36.5, logScale=FALSE) %>%
-  dplyr::select(Tumor_Sample_Barcode, total_perMB) %>%
-  as.data.frame()
-```
-
-```{r}
-# Saving oncoplot
-png(paste0(res_path,"/oncoplot_CN.png"), units = "in", res = 300, width = 12, height = 18)
-oncoplot(maf = merged_maf_cn, colors=vc_cols, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, top = 50, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.6, writeMatrix=TRUE)
-dev.off()
-```
-
-CN oncoplot for cosmic genes only 
+## Loading in cosmic genes
 
 ```{r}
 data(cgc_67, package = "COSMIC.67")
 cosmic_genes <- getGeneSummary(merged_maf)$Hugo_Symbol[getGeneSummary(merged_maf)$Hugo_Symbol %in% cgc_67$SYMBOL]
+```
 
-png(paste0(res_path,"/oncoplot_CN_cosmic.png"), units = "in", res = 300, width = 12, height = 17)
-oncoplot(maf = merged_maf_cn, colors=vc_cols, genes=cosmic_genes, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.5, writeMatrix=TRUE)
+## Oncoplot for CM- for all genes (Patients only)
+
+```{r}
+cm_neg_samples <- merged_maf_cn@clinical.data$Tumor_Sample_Barcode[grep(merged_maf_cn@clinical.data$Tumor_Sample_Barcode, pattern="*CM-$")]
+merged_maf_cm_neg <- subsetMaf(maf=merged_maf_cn, tsb=cm_neg_samples)
+
+tmb_df_cm_neg <- tmb(maf = merged_maf, captureSize=  36.5, logScale=FALSE) %>%
+  dplyr::select(Tumor_Sample_Barcode, total_perMB) %>%
+  dplyr::filter(Tumor_Sample_Barcode %in% cm_neg_samples) %>%
+  as.data.frame()
+
+png(paste0(res_path,"oncoplots_cn/oncoplot_cn_cm-.png"), units = "in", res = 300, width = 12, height = 17)
+oncoplot(maf = merged_maf_cm_neg, colors=vc_cols, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, top = 50, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df_cm_neg, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.6, writeMatrix=TRUE)
+dev.off()
+```
+
+## Oncoplot for CM- for COSMIC genes (Patients only)
+
+```{r}
+png(paste0(res_path,"oncoplots_cn/oncoplot_cosmic_cn_cm-.png"), units = "in", res = 300, width = 12, height = 17)
+oncoplot(maf = merged_maf_cm_neg, genes=cosmic_genes, colors=vc_cols, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, top = 50, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df_cm_neg, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.6, writeMatrix=TRUE)
+dev.off()
+```
+
+## Oncoplot for CM- with matching TISSUE for all genes (Patients only)
+
+```{r}
+cm_neg_tissue_samples <- merged_maf_cn@clinical.data$Tumor_Sample_Barcode[grep(merged_maf_cn@clinical.data$Tumor_Sample_Barcode, pattern="*CM-$|TISSUE$")]
+
+# Extract base identifiers
+base_ids <- str_extract(cm_neg_tissue_samples, ".*(?=_(CM-|TISSUE))")
+
+# Find unique identifiers with both CM- and TISSUE counterparts
+unique_ids <- unique(base_ids)
+paired_ids <- unique_ids[sapply(unique_ids, function(id) {
+    any(grepl(paste0(id, "_CM-"), cm_neg_tissue_samples)) &&
+    any(grepl(paste0(id, "_TISSUE"), cm_neg_tissue_samples))
+})]
+
+# Filter for CM- samples with a corresponding TISSUE sample
+cm_neg_tissue_samples_final <- cm_neg_tissue_samples[base_ids %in% paired_ids & grepl("_CM-|TISSUE", cm_neg_tissue_samples)]
+merged_maf_cm_neg_TISSUE <- subsetMaf(maf=merged_maf_cn, tsb=cm_neg_tissue_samples_final)
+
+tmb_df_cm_neg_TISSUE <- tmb(maf = merged_maf, captureSize=  36.5, logScale=FALSE) %>%
+  dplyr::select(Tumor_Sample_Barcode, total_perMB) %>%
+  dplyr::filter(Tumor_Sample_Barcode %in% cm_neg_tissue_samples_final) %>%
+  as.data.frame()
+
+png(paste0(res_path,"oncoplots_cn/oncoplot_cn_cm-_TISSUE.png"), units = "in", res = 300, width = 12, height = 17)
+oncoplot(maf = merged_maf_cm_neg_TISSUE, colors=vc_cols, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, top = 50, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df_cm_neg_TISSUE, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.6, writeMatrix=TRUE, sampleOrder=cm_neg_tissue_samples_final)
+dev.off()
+```
+
+## Oncoplot for CM- with matching TISSUE for COSMIC genes (Patients only)
+
+```{r}
+png(paste0(res_path,"oncoplots_cn/oncoplot_cosmic_cn_cm-_TISSUE.png"), units = "in", res = 300, width = 12, height = 17)
+oncoplot(maf = merged_maf_cm_neg_TISSUE, colors=vc_cols, genes = cosmic_genes, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, top = 50, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df_cm_neg_TISSUE, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.6, writeMatrix=TRUE, sampleOrder=cm_neg_tissue_samples_final)
+dev.off()
+```
+## Oncoplot for non-TISSUE PDO samples with all 4 conditions for all genes
+
+```{r}
+# Extract base identifiers
+base_ids <- str_extract(merged_maf_cn@clinical.data$Tumor_Sample_Barcode, ".*(?=_[^_]+$)")
+
+# Unique base identifiers
+unique_ids <- unique(base_ids)
+
+# Check for each identifier if all four conditions are present
+# Determine if all four conditions are present for each identifier
+valid_ids <- unique_ids[sapply(unique_ids, function(id) {
+    all(c(paste0(id, "_CM-"), paste0(id, "_CM+"), paste0(id, "_T1"), paste0(id, "_T2")) %in% merged_maf_cn@clinical.data$Tumor_Sample_Barcode)
+})]
+
+# Select samples with valid identifiers
+all_4_conditions_present_samples <- merged_maf_cn@clinical.data$Tumor_Sample_Barcode[base_ids %in% valid_ids]
+all_4_conditions_present_samples_no_TISSUE <- all_4_conditions_present_samples %>%
+  grep(pattern=".*TISSUE", value = TRUE, invert=TRUE)
+
+merged_maf_all_4_conditions<- subsetMaf(maf=merged_maf_cn, tsb=all_4_conditions_present_samples_no_TISSUE)
+
+tmb_df_all_4_conditions <- tmb(maf = merged_maf, captureSize=  36.5, logScale=FALSE) %>%
+  dplyr::select(Tumor_Sample_Barcode, total_perMB) %>%
+  as.data.frame()
+
+png(paste0(res_path,"oncoplots_cn/oncoplot_cn_all4conditions.png"), units = "in", res = 300, width = 12, height = 17)
+oncoplot(maf = merged_maf_all_4_conditions, colors=vc_cols, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, top = 50, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df_all_4_conditions, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.6, writeMatrix=TRUE,
+sampleOrder=all_4_conditions_present_samples_no_TISSUE)
+dev.off()
+```
+## Oncoplot for non-TISSUE PDO samples with all 4 conditions for COSMIC genes
+
+```{r}
+png(paste0(res_path,"oncoplots_cn/oncoplot_cosmic_cn_all4conditions.png"), units = "in", res = 300, width = 12, height = 17)
+oncoplot(maf = merged_maf_all_4_conditions, genes=cosmic_genes, colors=vc_cols, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, top = 50, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df_organoid_neg, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.6, writeMatrix=TRUE, sampleOrder=all_4_conditions_present_samples_no_TISSUE)
+dev.off()
+```
+
+## Oncoplot for all samples with all genes
+
+```{r}
+tmb_df <- tmb(maf = merged_maf, captureSize=  36.5, logScale=FALSE) %>%
+  dplyr::select(Tumor_Sample_Barcode, total_perMB) %>%
+  as.data.frame()
+
+# Saving oncoplot - not that useful as there are many genes involved
+png(paste0(res_path,"oncoplots_cn/oncoplot_cn.png"), units = "in", res = 300, width = 12, height = 17)
+oncoplot(maf = merged_maf_cn, colors=vc_cols, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, top = 50, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.6, writeMatrix=TRUE)
+dev.off()
+```
+
+## Oncoplot of all samples with genes within COSMIC database
+
+```{r}
+png(paste0(res_path,"oncoplots_cn/oncoplot_cosmic_cn.png"), units = "in", res = 300, width = 12, height = 17)
+oncoplot(maf = merged_maf_cn, colors=vc_cols, genes=cosmic_genes, clinicalFeatures=c("Patient","Treatment","Sample_Label","Stage"), annotationColor=anno_colors, sortByAnnotation=TRUE, anno_height= 1, showTumorSampleBarcodes=TRUE, barcodeSrt = 90,  barcode_mar=10, showTitle=FALSE, drawBox=TRUE, gene_mar=4.5, draw_titv=FALSE, annotationFontSize=1, topBarData = tmb_df, drawColBar=TRUE, legendFontSize =1, SampleNamefontSize=1, fontSize = 0.5, writeMatrix=TRUE,
+         rightBarLims)
 dev.off()
 ```

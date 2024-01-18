@@ -75,14 +75,17 @@ names(df_conditions_color_mapping) <- mymaf@clinical.data$Tumor_Sample_Barcode
 # Create a data frame for the heatmap annotation
 annotation_df <- data.frame(patients = patients, conditions = sample_conditions)
 rownames(annotation_df) <- mymaf@clinical.data$Tumor_Sample_Barcode
-annotation_df <- annotation_df[colnames(heatmap_data),]
 ```
 
 ```{r}
-# Create a unique mutation identifier
-mutation_data <- merged_maf@data %>% 
-  mutate(unique_mutation = paste(Hugo_Symbol, HGVSp, sep = "_"))
+data(cgc_67, package = "COSMIC.67")
+cosmic_genes <- getGeneSummary(merged_maf)$Hugo_Symbol[getGeneSummary(merged_maf)$Hugo_Symbol %in% cgc_67$SYMBOL]
 
+# Create a unique mutation identifier and include only cosmic genes
+mutation_data <- merged_maf@data %>% 
+  mutate(unique_mutation = paste(Hugo_Symbol, HGVSp, sep = "_")) %>%
+  dplyr::filter(Hugo_Symbol %in% cosmic_genes )
+  
 # Pivot to create a matrix suitable for clustering
 # We use the tidyr package's pivot_wider function to achieve this
 mutation_matrix <- mutation_data %>%
@@ -99,10 +102,27 @@ heatmap_data
 col_fun <- c("0" = "black", "1" = "yellow")
 ```
 
-```{r}
-set.seed(1995)
+Showing only samples with TISSUE and also in a particular order
 
-# Create the heatmap with unsupervised clustering
+```{r}
+cm_neg_tissue_samples
+base_ids <- grep(cm_neg_tissue_samples, pattern="TISSUE))", value=TRUE)
+base_ids <- str_extract(colnames(heatmap_data), ".*(?=_(TISSUE))") %>% na.omit()
+unique_ids <- unique(base_ids)
+samples_of_interest <- c()
+for (sample_id in unique_ids){
+  samples_of_interest <- c(samples_of_interest, grep(colnames(heatmap_data), pattern=sample_id, value=TRUE))
+}
+
+annotation_df <- annotation_df[colnames(heatmap_data),]
+annotation_df_small <- annotation_df[samples_of_interest,]
+heatmap_data_small <- heatmap_data[,samples_of_interest]
+```
+
+
+```{r}
+set.seed(2022)
+
 ht <- Heatmap(heatmap_data, 
         name = "mutations",
         col = col_fun,
@@ -112,13 +132,35 @@ ht <- Heatmap(heatmap_data,
         cluster_rows = FALSE, # don't cluster mutations
         column_names_gp = gpar(fontsize = 10),  # reduce column names font size
         cluster_columns = TRUE, # cluster samples
-        column_title="Unsupervised clustering of PDO and patient tissue samples based on the SNPs and INDELs mutational landscape",
-        clustering_distance_columns="spearman",
+        clustering_distance_columns=jaccard_dist,
         column_km=17,
         show_heatmap_legend=TRUE,
         top_annotation = HeatmapAnnotation(df = annotation_df, col = list(patients = patients_color_mapping, conditions=conditions_color_mapping)))
 
-png(paste0(res_path,"unsupervised_clustering_snps_indels_shortName.png"), res=300, units = "in", width = 15, height=10)
+png(paste0(res_path,"unsupervised_clustering_snps_indels_shortName_COSMIC.png"), res=300, units = "in", width = 15, height=10)
 ht
+dev.off()
+```
+
+Only the 7 samples with matched tissue
+```{r}
+set.seed(2022)
+# Create the heatmap with unsupervised clustering
+ht_small <- Heatmap(heatmap_data_small, 
+        name = "mutations",
+        col = col_fun,
+        column_dend_height = unit(50, "mm"),
+        show_column_names = TRUE, # Show column names
+        show_row_names = FALSE,
+        cluster_rows = FALSE, # don't cluster mutations
+        column_names_gp = gpar(fontsize = 10),  # reduce column names font size
+        cluster_columns = TRUE, # cluster samples
+        clustering_distance_columns=jaccard_dist,
+        column_km=7,
+        show_heatmap_legend=TRUE,
+        top_annotation = HeatmapAnnotation(df = annotation_df_small, col = list(patients = patients_color_mapping, conditions=conditions_color_mapping)))
+
+png(paste0(res_path,"unsupervised_clustering_snps_indels_shortName_COSMIC_onlyMatchedTissue.png"), res=300, units = "in", width = 15, height=10)
+ht_small
 dev.off()
 ```

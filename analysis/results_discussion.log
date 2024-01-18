@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.2.22)  17 JAN 2024 12:35
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.2.22)  18 JAN 2024 05:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -493,128 +493,121 @@ File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [1
 
 {/home/kane/.TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2]
-<../results/combined_batches_wes/vcfstats_combined_all.png, id=123, 1445.4pt x 1300.86pt>
+<../results/combined_batches_wes/vcfstats_combined_all.png, id=122, 1445.4pt x 1300.86pt>
 File: ../results/combined_batches_wes/vcfstats_combined_all.png Graphic file (type png)
 <use ../results/combined_batches_wes/vcfstats_combined_all.png>
-Package pdftex.def Info: ../results/combined_batches_wes/vcfstats_combined_all.png  used on input line 178.
+Package pdftex.def Info: ../results/combined_batches_wes/vcfstats_combined_all.png  used on input line 182.
 (pdftex.def)             Requested size: 469.74944pt x 422.77449pt.
-<../results/combined_batches_wes/tcga_upset_allGenes_CM-.png, id=129, 1084.05pt x 867.24pt>
+<../results/combined_batches_wes/tcga_upset_allGenes_CM-.png, id=128, 1084.05pt x 867.24pt>
 File: ../results/combined_batches_wes/tcga_upset_allGenes_CM-.png Graphic file (type png)
 <use ../results/combined_batches_wes/tcga_upset_allGenes_CM-.png>
-Package pdftex.def Info: ../results/combined_batches_wes/tcga_upset_allGenes_CM-.png  used on input line 200.
+Package pdftex.def Info: ../results/combined_batches_wes/tcga_upset_allGenes_CM-.png  used on input line 204.
 (pdftex.def)             Requested size: 469.75496pt x 375.80397pt.
-<../results/combined_batches_wes/tcga_upset_cosmic_genes.png, id=130, 1084.05pt x 867.24pt>
+<../results/combined_batches_wes/tcga_upset_cosmic_genes.png, id=129, 1084.05pt x 867.24pt>
 File: ../results/combined_batches_wes/tcga_upset_cosmic_genes.png Graphic file (type png)
 <use ../results/combined_batches_wes/tcga_upset_cosmic_genes.png>
-Package pdftex.def Info: ../results/combined_batches_wes/tcga_upset_cosmic_genes.png  used on input line 209.
+Package pdftex.def Info: ../results/combined_batches_wes/tcga_upset_cosmic_genes.png  used on input line 213.
 (pdftex.def)             Requested size: 469.75496pt x 375.80397pt.
-<../results/combined_batches_wes/tcga_co_oncoplot_CM-.png, id=131, 1011.78pt x 578.16pt>
+<../results/combined_batches_wes/tcga_co_oncoplot_CM-.png, id=130, 1011.78pt x 578.16pt>
 File: ../results/combined_batches_wes/tcga_co_oncoplot_CM-.png Graphic file (type png)
 <use ../results/combined_batches_wes/tcga_co_oncoplot_CM-.png>
-Package pdftex.def Info: ../results/combined_batches_wes/tcga_co_oncoplot_CM-.png  used on input line 218.
+Package pdftex.def Info: ../results/combined_batches_wes/tcga_co_oncoplot_CM-.png  used on input line 222.
 (pdftex.def)             Requested size: 469.76266pt x 268.4358pt.
-<../results/combined_batches_wes/tcgaCompare_tmb.png, id=132, 867.24pt x 867.24pt>
+<../results/combined_batches_wes/tcgaCompare_tmb.png, id=131, 867.24pt x 867.24pt>
 File: ../results/combined_batches_wes/tcgaCompare_tmb.png Graphic file (type png)
 <use ../results/combined_batches_wes/tcgaCompare_tmb.png>
-Package pdftex.def Info: ../results/combined_batches_wes/tcgaCompare_tmb.png  used on input line 227.
+Package pdftex.def Info: ../results/combined_batches_wes/tcgaCompare_tmb.png  used on input line 231.
 (pdftex.def)             Requested size: 469.75827pt x 469.75827pt.
-<../results/combined_batches_wes/oncoplot_cosmic_snp_indel.png, id=134, 867.24pt x 1228.59pt>
-File: ../results/combined_batches_wes/oncoplot_cosmic_snp_indel.png Graphic file (type png)
-<use ../results/combined_batches_wes/oncoplot_cosmic_snp_indel.png>
-Package pdftex.def Info: ../results/combined_batches_wes/oncoplot_cosmic_snp_indel.png  used on input line 246.
+[3] [4 <../results/combined_batches_wes/vcfstats_combined_all.png (PNG copy)>] [5 <../results/combined_batches_wes/tcga_upset_allGenes_CM-.png>] [6 <../results/combined_batches_wes/tcga_upset_cosmic_genes.png>] [7 <../results/combined_batches_wes/tcga_co_oncoplot_CM-.png (PNG copy)>] [8 <../results/combined_batches_wes/tcgaCompare_tmb.png (PNG copy)>]
+<../results/combined_batches_wes/oncoplot_snps_indels/oncoplot_cosmic_snp_indel_cm-.png, id=182, 867.24pt x 1228.59pt>
+File: ../results/combined_batches_wes/oncoplot_snps_indels/oncoplot_cosmic_snp_indel_cm-.png Graphic file (type png)
+<use ../results/combined_batches_wes/oncoplot_snps_indels/oncoplot_cosmic_snp_indel_cm-.png>
+Package pdftex.def Info: ../results/combined_batches_wes/oncoplot_snps_indels/oncoplot_cosmic_snp_indel_cm-.png  used on input line 274.
 (pdftex.def)             Requested size: 459.13217pt x 650.43723pt.
 
-LaTeX Warning: Float too large for page by 24.50722pt on input line 251.
+LaTeX Warning: Float too large for page by 24.50722pt on input line 279.
 
-<../results/combined_batches_wes/num_gene_category.png, id=136, 722.7pt x 722.7pt>
-File: ../results/combined_batches_wes/num_gene_category.png Graphic file (type png)
-<use ../results/combined_batches_wes/num_gene_category.png>
-Package pdftex.def Info: ../results/combined_batches_wes/num_gene_category.png  used on input line 257.
+<../results/combined_batches_wes/num_gene_category_cm-.png, id=183, 722.7pt x 722.7pt>
+File: ../results/combined_batches_wes/num_gene_category_cm-.png Graphic file (type png)
+<use ../results/combined_batches_wes/num_gene_category_cm-.png>
+Package pdftex.def Info: ../results/combined_batches_wes/num_gene_category_cm-.png  used on input line 285.
 (pdftex.def)             Requested size: 469.76045pt x 469.76045pt.
-[3] [4 <../results/combined_batches_wes/vcfstats_combined_all.png (PNG copy)>] [5 <../results/combined_batches_wes/tcga_upset_allGenes_CM-.png>] [6 <../results/combined_batches_wes/tcga_upset_cosmic_genes.png>] [7 <../results/combined_batches_wes/tcga_co_oncoplot_CM-.png (PNG copy)>] [8 <../results/combined_batches_wes/tcgaCompare_tmb.png (PNG copy)>] [9 <../results/combined_batches_wes/oncoplot_cosmic_snp_indel.png (PNG copy)>] [10 <../results/combined_batches_wes/num_gene_category.png (PNG copy)>]
-<../results/combined_batches_wes/wes_sanger_comparison.png, id=187, 578.16pt x 722.7pt>
+<../results/combined_batches_wes/wes_sanger_comparison.png, id=185, 578.16pt x 722.7pt>
 File: ../results/combined_batches_wes/wes_sanger_comparison.png Graphic file (type png)
 <use ../results/combined_batches_wes/wes_sanger_comparison.png>
-Package pdftex.def Info: ../results/combined_batches_wes/wes_sanger_comparison.png  used on input line 287.
+Package pdftex.def Info: ../results/combined_batches_wes/wes_sanger_comparison.png  used on input line 315.
 (pdftex.def)             Requested size: 469.75385pt x 587.1923pt.
-<../results/combined_batches_wes/unsupervised_clustering_snps_indels_shortName.png, id=189, 1084.05pt x 722.7pt>
-File: ../results/combined_batches_wes/unsupervised_clustering_snps_indels_shortName.png Graphic file (type png)
-<use ../results/combined_batches_wes/unsupervised_clustering_snps_indels_shortName.png>
-Package pdftex.def Info: ../results/combined_batches_wes/unsupervised_clustering_snps_indels_shortName.png  used on input line 317.
+[9] [10 <../results/combined_batches_wes/oncoplot_snps_indels/oncoplot_cosmic_snp_indel_cm-.png (PNG copy)>] [11 <../results/combined_batches_wes/num_gene_category_cm-.png (PNG copy)>] [12 <../results/combined_batches_wes/wes_sanger_comparison.png (PNG copy)>]
+<../results/combined_batches_wes/unsupervised_clustering_snps_indels_shortName_COSMIC_onlyMatchedTissue.png, id=206, 1084.05pt x 722.7pt>
+File: ../results/combined_batches_wes/unsupervised_clustering_snps_indels_shortName_COSMIC_onlyMatchedTissue.png Graphic file (type png)
+<use ../results/combined_batches_wes/unsupervised_clustering_snps_indels_shortName_COSMIC_onlyMatchedTissue.png>
+Package pdftex.def Info: ../results/combined_batches_wes/unsupervised_clustering_snps_indels_shortName_COSMIC_onlyMatchedTissue.png  used on input line 344.
 (pdftex.def)             Requested size: 469.75496pt x 313.16995pt.
-<../results/combined_batches_wes/oncoplot_CN.png, id=192, 867.24pt x 1300.86pt>
-File: ../results/combined_batches_wes/oncoplot_CN.png Graphic file (type png)
-<use ../results/combined_batches_wes/oncoplot_CN.png>
-Package pdftex.def Info: ../results/combined_batches_wes/oncoplot_CN.png  used on input line 333.
-(pdftex.def)             Requested size: 433.63217pt x 650.44826pt.
-
-LaTeX Warning: Float too large for page by 24.51825pt on input line 338.
-
-<../results/combined_batches_wes/oncoplot_CN_cosmic.png, id=193, 867.24pt x 1228.59pt>
-File: ../results/combined_batches_wes/oncoplot_CN_cosmic.png Graphic file (type png)
-<use ../results/combined_batches_wes/oncoplot_CN_cosmic.png>
-Package pdftex.def Info: ../results/combined_batches_wes/oncoplot_CN_cosmic.png  used on input line 342.
+<../results/combined_batches_wes/oncoplots_cn/oncoplot_cn_cm-.png, id=208, 867.24pt x 1228.59pt>
+File: ../results/combined_batches_wes/oncoplots_cn/oncoplot_cn_cm-.png Graphic file (type png)
+<use ../results/combined_batches_wes/oncoplots_cn/oncoplot_cn_cm-.png>
+Package pdftex.def Info: ../results/combined_batches_wes/oncoplots_cn/oncoplot_cn_cm-.png  used on input line 358.
 (pdftex.def)             Requested size: 459.13217pt x 650.43723pt.
 
-LaTeX Warning: Float too large for page by 24.50722pt on input line 347.
+LaTeX Warning: Float too large for page by 35.95164pt on input line 363.
 
-[11] [12 <../results/combined_batches_wes/wes_sanger_comparison.png (PNG copy)>] [13 <../results/combined_batches_wes/unsupervised_clustering_snps_indels_shortName.png (PNG copy)>] [14 <../results/combined_batches_wes/oncoplot_CN.png (PNG copy)>] [15 <../results/combined_batches_wes/oncoplot_CN_cosmic.png (PNG copy)>]
-<../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png, id=226, 867.24pt x 1228.59pt>
+[13 <../results/combined_batches_wes/unsupervised_clustering_snps_indels_shortName_COSMIC_onlyMatchedTissue.png (PNG copy)>] [14 <../results/combined_batches_wes/oncoplots_cn/oncoplot_cn_cm-.png (PNG copy)>]
+<../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png, id=225, 867.24pt x 1228.59pt>
 File: ../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png Graphic file (type png)
 <use ../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png>
-Package pdftex.def Info: ../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png  used on input line 362.
+Package pdftex.def Info: ../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png  used on input line 378.
 (pdftex.def)             Requested size: 459.13217pt x 650.43723pt.
 
-LaTeX Warning: Float too large for page by 23.95164pt on input line 367.
+LaTeX Warning: Float too large for page by 23.95164pt on input line 383.
 
-<../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png, id=227, 867.24pt x 1228.59pt>
+<../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png, id=226, 867.24pt x 1228.59pt>
 File: ../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png Graphic file (type png)
 <use ../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png>
-Package pdftex.def Info: ../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png  used on input line 371.
+Package pdftex.def Info: ../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png  used on input line 387.
 (pdftex.def)             Requested size: 459.13217pt x 650.43723pt.
 
-LaTeX Warning: Float too large for page by 23.95164pt on input line 376.
+LaTeX Warning: Float too large for page by 23.95164pt on input line 392.
 
-<../results/combined_batches_wes/tmb_tissueOnly.png, id=230, 867.24pt x 867.24pt>
+<../results/combined_batches_wes/tmb_tissueOnly.png, id=229, 867.24pt x 867.24pt>
 File: ../results/combined_batches_wes/tmb_tissueOnly.png Graphic file (type png)
 <use ../results/combined_batches_wes/tmb_tissueOnly.png>
-Package pdftex.def Info: ../results/combined_batches_wes/tmb_tissueOnly.png  used on input line 387.
+Package pdftex.def Info: ../results/combined_batches_wes/tmb_tissueOnly.png  used on input line 403.
 (pdftex.def)             Requested size: 469.75827pt x 469.75827pt.
-<../results/combined_batches_wes/tmb_OrganoidOnly.png, id=231, 867.24pt x 867.24pt>
+<../results/combined_batches_wes/tmb_OrganoidOnly.png, id=230, 867.24pt x 867.24pt>
 File: ../results/combined_batches_wes/tmb_OrganoidOnly.png Graphic file (type png)
 <use ../results/combined_batches_wes/tmb_OrganoidOnly.png>
-Package pdftex.def Info: ../results/combined_batches_wes/tmb_OrganoidOnly.png  used on input line 396.
+Package pdftex.def Info: ../results/combined_batches_wes/tmb_OrganoidOnly.png  used on input line 412.
 (pdftex.def)             Requested size: 469.75827pt x 469.75827pt.
-<../results/combined_batches_wes/msisensor.png, id=233, 867.24pt x 1300.86pt>
+<../results/combined_batches_wes/msisensor.png, id=232, 867.24pt x 1300.86pt>
 File: ../results/combined_batches_wes/msisensor.png Graphic file (type png)
 <use ../results/combined_batches_wes/msisensor.png>
-Package pdftex.def Info: ../results/combined_batches_wes/msisensor.png  used on input line 410.
+Package pdftex.def Info: ../results/combined_batches_wes/msisensor.png  used on input line 426.
 (pdftex.def)             Requested size: 433.63217pt x 650.44826pt.
 
-LaTeX Warning: Float too large for page by 34.57825pt on input line 415.
+LaTeX Warning: Float too large for page by 34.57825pt on input line 431.
 
-<../results/combined_batches_wes/optitype_jaccard.png, id=235, 722.7pt x 650.43pt>
+<../results/combined_batches_wes/optitype_jaccard.png, id=234, 722.7pt x 650.43pt>
 File: ../results/combined_batches_wes/optitype_jaccard.png Graphic file (type png)
 <use ../results/combined_batches_wes/optitype_jaccard.png>
-Package pdftex.def Info: ../results/combined_batches_wes/optitype_jaccard.png  used on input line 424.
+Package pdftex.def Info: ../results/combined_batches_wes/optitype_jaccard.png  used on input line 440.
 (pdftex.def)             Requested size: 469.76045pt x 422.78441pt.
-[16] [17 <../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png (PNG copy)>] [18 <../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png (PNG copy)>] [19 <../results/combined_batches_wes/tmb_tissueOnly.png (PNG copy)>] [20 <../results/combined_batches_wes/tmb_OrganoidOnly.png (PNG copy)>] [21 <../results/combined_batches_wes/msisensor.png (PNG copy)>] [22 <../results/combined_batches_wes/optitype_jaccard.png (PNG copy)>] (./results_discussion.aux)
+[15] [16 <../results/combined_batches_wes/complexheatmap_CN_group_condition_KRAS_only.png (PNG copy)>] [17 <../results/combined_batches_wes/complexheatmap_CN_KRAS_only.png (PNG copy)>] [18 <../results/combined_batches_wes/tmb_tissueOnly.png (PNG copy)>] [19 <../results/combined_batches_wes/tmb_OrganoidOnly.png (PNG copy)>] [20 <../results/combined_batches_wes/msisensor.png (PNG copy)>] [21 <../results/combined_batches_wes/optitype_jaccard.png (PNG copy)>] (./results_discussion.aux)
 Package rerunfilecheck Info: File `results_discussion.out' has not changed.
 (rerunfilecheck)             Checksum: 013B7BEF82E7E3A63DC888C85B46869E;3785.
  ) 
 Here is how much of TeX's memory you used:
- 12076 strings out of 477989
- 195548 string characters out of 5839283
+ 12074 strings out of 477989
+ 195962 string characters out of 5839283
  1865346 words of memory out of 5000000
- 31962 multiletter control sequences out of 15000+600000
+ 31953 multiletter control sequences out of 15000+600000
  565740 words of font info for 77 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 75i,11n,76p,2035b,464s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,11n,76p,1826b,441s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/home/kane/.TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/home/kane/.TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}</home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></home/kane/.TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on results_discussion.pdf (22 pages, 6586157 bytes).
+Output written on results_discussion.pdf (21 pages, 5464632 bytes).
 PDF statistics:
- 333 PDF objects out of 1000 (max. 8388607)
- 269 compressed objects within 3 object streams
- 77 named destinations out of 1000 (max. 500000)
- 222 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 335 PDF objects out of 1000 (max. 8388607)
+ 273 compressed objects within 3 object streams
+ 83 named destinations out of 1000 (max. 500000)
+ 217 words of extra memory for PDF output out of 10000 (max. 10000000)
 

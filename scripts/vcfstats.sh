@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eo pipefail
 
-BASE_PATH="/media/gedac/kane/projects/booney_wes/results_wes_full_40samples_pad50bp/"
+BASE_PATH="/media/gedac/kane/projects/booney_wes/results_wes_2_pad50bp/"
 
 # Loop through each sample folder
 for sample_dir in $(ls -d ${BASE_PATH}/annotation/mutect2/*); do

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eo pipefail
 
-BASE_PATH="/media/gedac/kane/projects/booney_wes/results_wes_full_40samples_pad50bp"
+BASE_PATH="/media/gedac/kane/projects/booney_wes/results_wes_2_pad50bp"
 FILTER_MAXAF_IMPACT="(MAX_AF < 0.001 or not MAX_AF) and ((IMPACT is HIGH) or (IMPACT is MODERATE and (SIFT match deleterious or PolyPhen match damaging)))"
 FILTER_MAXAF="(MAX_AF < 0.001 or not MAX_AF)"
 
@@ -111,7 +111,7 @@ for sample_dir in $(ls -d ${BASE_PATH}/annotation/mutect2/*); do
 
         # Convert VCF to MAF and output in directory called maf.
         vcf2maf.pl --input-vcf "$combined_vcf" --output-maf "$combined_maf" \
-        --inhibit-vep --ref-fasta "Homo_sapiens_assembly38.fasta" \
+        --inhibit-vep --ref-fasta "/media/gedac/kane/projects/booney_wes/Homo_sapiens_assembly38.fasta" \
         --tumor-id $TUMOR_NAME \
         --normal-id $NORMAL_NAME
         echo "The maf file is saved as $combined_maf!"

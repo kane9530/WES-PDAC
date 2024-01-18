@@ -1,0 +1,165 @@
+---
+title: "vcfstats"
+output: html_document
+date: "2023-06-30"
+---
+
+```{r}
+# Load the necessary libraries
+library(dplyr)
+library(ggplot2)
+library(purrr)
+library(readr)
+library(ArchR)
+library(stringr)
+
+res_path <- "../results/combined_batches_wes/"
+```
+
+```{r}
+# Specify the directory where your text files are
+file_dir <- "../results/combined_batches_wes/vcfstats" 
+
+# Get a list of all the .txt files in the directory
+file_list <- list.files(file_dir, pattern = "*.txt", full.names = TRUE, recursive=TRUE)
+
+# Read in each file, add a "caller" column, and combine into one data frame
+df <- file_list %>%
+  map_df(~{
+    # Determine caller from filename
+    caller <- ifelse(grepl("mutect2", .x), "mutect2", 
+                     ifelse(grepl("strelka2", .x), "strelka2", 
+                            ifelse(grepl("final", .x), "combined", NA)))
+    stage <- ifelse(grepl("initial", .x), "caller_filter", 
+                     ifelse(grepl("maxAF", .x), "maxaf_filter", 
+                            ifelse(grepl("final", .x), "combined", NA)))
+    
+    # Read the file and add the caller column
+    read.table(.x, header = FALSE, stringsAsFactors = FALSE) %>%
+      dplyr::mutate(caller = caller, stage = stage)
+  })
+colnames(df) <- c("sample_name", "number", "filter_status", "caller", "stage")
+df <- df %>%
+  dplyr::mutate(patient_id = paste0("PCA", stringr::str_extract(sample_name, "^[0-9]+")),
+                sample_name_prefix = str_split(sample_name, "_vs", simplify = TRUE)[,1],
+                sample_name_clean = paste(patient_id, sample_name_prefix, sep="_")) 
+```
+Load MAF file from 02A)
+```{r}
+mymaf <- read.maf(paste0(res_path,"merged_mafs_allBatches_160124_maftools.maf"), removeDuplicatedVariants=TRUE)
+```
+
+Plot 1: Breakdown of each caller's filter category across samples
+
+```{r}
+sums_mutect2_initial <- df %>%
+  dplyr::filter(caller =="mutect2" & stage=="caller_filter") %>%
+  dplyr::group_by(filter_status) %>%
+  dplyr::summarise(number_group = sum(number))
+
+sums_strelka2_initial <- df %>%
+  dplyr::filter(caller =="strelka2" & stage =="caller_filter") %>%
+  dplyr::group_by(filter_status) %>%
+  dplyr::summarise(number_group = sum(number))
+
+mutect2_df <- mutect2_breakdown <- df %>%
+  dplyr::filter(caller =="mutect2" & stage=="caller_filter")
+
+mutect2_df$filter_status <- factor(mutect2_df$filter_status, 
+                     levels = c("base_qual", "clustered_events", "contamination",   
+"fragment","germline", "haplotype" , "map_qual", "multiallelic" ,"normal_artifact", "orientation", "panel_of_normals", "position" , "slippage", "strand_bias" , "weak_evidence", "PASS"))
+
+mutect2_breakdown <- mutect2_df %>%
+  ggplot(aes(x= filter_status, y=number)) + 
+  geom_bar(stat = "identity", aes( fill = sample_name_clean)) +
+  geom_text(data = sums_mutect2_initial, aes(y = number_group, label = number_group), vjust = -0.5)+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=90)) +
+  scale_fill_manual(values = ArchR::paletteDiscrete(values = df$sample_name_clean, 
+                                                     set = "stallion", 
+                                                     reverse = FALSE)) +
+  ggtitle("SNPs/INDELs categorised across Mutect2 filters")
+
+strelka2_breakdown <- df %>%
+  dplyr::filter(caller =="strelka2" & stage=="caller_filter") %>%
+  ggplot(aes(x= filter_status, y=number)) + 
+  geom_bar(stat = "identity", aes(fill = sample_name_clean)) +
+  geom_text(data = sums_strelka2_initial, aes(y = number_group, label = number_group), vjust = -0.5)+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=90), legend.position = "none") +
+  scale_fill_manual(values = ArchR::paletteDiscrete(values = df$sample_name_clean,
+                                                     set = "stallion", 
+                                                     reverse = FALSE))+
+  scale_y_continuous(labels=scales::comma) +
+  ggtitle("SNPs/INDELs categorised across Strelka2 filters")
+
+png(paste0(res_path, "vcfstats_callers.png"), res=300, units = "in", width = 20, height=10)
+vcfstats_callers <- cowplot::plot_grid(mutect2_breakdown, strelka2_breakdown, nrow = 1, rel_widths = c(2,1))
+vcfstats_callers
+dev.off()
+
+unique(df$sample_name_clean)
+```
+
+Plot 2: Number of variants passing the maxAF filter for each caller.
+```{r}
+sum_across_callers <- df %>%
+  dplyr::filter(stage == "maxaf_filter") %>%
+  dplyr::group_by(sample_name_clean) %>%
+  dplyr::summarise(num_variants = sum(number))
+
+maxaf_impact_df <- df %>%
+  dplyr::filter(stage == "maxaf_filter") %>%
+  dplyr::arrange(sample_name_clean, caller) %>%  # Arrange by 'sample_name' and 'caller' to ensure correct stacking order
+  dplyr::group_by(sample_name_clean) %>%
+  dplyr::mutate(label_position = cumsum(number) - 0.5 * number)  # Compute middle position of each segment
+
+maxaf_impact_df$caller <- factor(maxaf_impact_df$caller, levels=c("strelka2", "mutect2"))
+
+maxafimpact <- maxaf_impact_df %>%
+  ggplot(aes(x= sample_name_clean, y=number)) + 
+  geom_bar(stat = "identity", aes(fill = caller)) +
+ geom_text(aes(label = number, y = ), position = position_stack(vjust = 0.5)) + 
+  geom_text(data = sum_across_callers, aes(y = num_variants, label = num_variants), vjust = -0.5, color = "blue")+
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=90, size = 8)) +
+  ggtitle("SNPs/INDELs after the maxAF filter")
+
+png(paste0(res_path,"/vcfstats_maxaf.png"), res=300, units = "in", width = 10, height=10)
+maxafimpact
+dev.off()
+```
+
+Plot 3: Final number of variants for each sample
+
+```{r}
+final_number_union <- mymaf@variants.per.sample %>%
+  ggplot(aes(x= Tumor_Sample_Barcode, y=Variants, fill=Tumor_Sample_Barcode)) + 
+  geom_bar(stat = "identity") +
+ geom_text(aes(label = Variants), vjust=-0.5) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=90), legend.position = "none") +
+  ggtitle("Union of both callers and removal of silent and duplicated variants") +
+  scale_fill_manual(values = ArchR::paletteDiscrete(values = mymaf@variants.per.sample$Tumor_Sample_Barcode, set = "stallion", 
+reverse = FALSE))
+
+png(paste0(res_path, "vcfstats_final_number_union.png"), res=300, units = "in", width = 10, height=10)
+final_number_union
+dev.off()
+```
+Combined plots
+
+```{r}
+top_row =  cowplot::plot_grid(vcfstats_callers, labels=c("A"))
+mid_row = cowplot::plot_grid(maxafimpact, labels=c("B"))
+bottom_row = cowplot::plot_grid(final_number_union, labels=c("C"))
+
+png(paste0(res_path, "vcfstats_combined_all.png"), res=300, units = "in", width = 20, height=18)
+cowplot::plot_grid(top_row, mid_row, bottom_row, nrow=3)
+dev.off()
+```
+
+
+
+
+

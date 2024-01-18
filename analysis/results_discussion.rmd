@@ -50,11 +50,15 @@ and carrying out quality recalibration at the base level. Mutect2 and Strelka2 w
 
 The filtered VCF files across both callers were then combined and converted to MAF format with the [vcf2maf](https://github.com/mskcc/vcf2maf) tool. Downstream analysis was carried out in R using the maftools packages, and several heatmaps were drawn with the ComplexHeatmap package. The tumor mutational
 burden (TMB) score was computed with the `tmb` function in maftools, with the twist exome panel
-capture size of 36.5 MB supplied to the captureSize parameter. 
+capture size of 36.5 MB supplied to the captureSize parameter. The list of COSMIC genes were taken from the `COSMIC.67` R package. 
 
 Mutational data from the TCGA_PAAD cohort was retrieved from maftools with the `tcgaLoad` function. The sample
 with the tumor sample barcode of ‘TCGA-IB-7651-01” was excluded from the analysis as it has around two orders of magnitude more
 mutations identified than the rest of the samples, making it a clear outlier.
+
+To perform the unsupervised clustering of our samples, we first constructed a binary matrix that indicates the absence or presence of each mutation. The
+heatmap was plotted using the `ComplexHeatmap` R package, with a custom-defined Jaccard distance metric to measure the dissimilarity between samples based on the
+binary matrix. 
 
 ## Copy number alterations
 
@@ -128,21 +132,35 @@ knitr::include_graphics(paste0(res_path_report, "tcgaCompare_tmb.png"))
 
 ## Somatic SNP/INDEL mutational landscape
 
-Here, we discuss the SNP/INDEL mutational landscape for our samples. The oncoplot shown in Figure \@ref(fig:oncoplotCosmic) shows the
-mutated genes that were also present in the COSMIC database,  emphasising known mutations with causal implications
-in carcinogenesis. Across the 50 PDAC samples, we observed that 46 samples (92%) possess the KRAS mutation . Of the 46 samples with the KRAS mutation, 24 samples (52%) exhibit G12V,  16 (35%) G12V and 5 G12R (11%). 
-62% of the samples have mutations in the TP53 gene, with each
-patient harboring a different mutation (See `TP53_lollipop.png` for the range of mutations displayed). Other genes that were mutated in relatively high proportion include the ARID1A (32%), ATM (20%), 
-CDKN2A (26%) and SMAD4 (20%) mutations.
+Here, we discuss the SNP/INDEL mutational landscape for our samples. 
 
-```{r oncoplotCosmic, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs in the COSMIC genes"}
-knitr::include_graphics(paste0(res_path_report, "oncoplot_cosmic_snp_indel.png"))
+### Directory organisation for oncoplots 
+
+All oncoplots are kept in two folders: `oncoplot_snps_indels/` and `oncoplot_cn/`. The file names are similar for both directories. Taking `oncoplot_snps_indels` to illustrate, there are 8 oncoplots, grouped into 4 pairs:
+
+1. CM- samples only: all mutated genes or COSMIC genes only 
+2. CM- samples with matched tissue samples: all mutated genes or COSMIC genes only
+3. PDOs with all 4 (CM-, CM+, T1, T2) conditions present: all mutated genes or COSMIC genes only 
+4. All samples: all mutated genes or COSMIC genes only
+
+### Discussion of CM- SNP/INDEL landscape
+
+In this discussion, we focus only on the CM- samples. The oncoplot shown in Figure \@ref(fig:oncoplotCosmic) shows the mutated genes that were present in the COSMIC database,  
+emphasising known mutations with causal implications
+in carcinogenesis. COSMIC genes were included in the oncoplot as long as at least a single sample amongst the 50 samples analysed show a mutation. Hence, the COSMIC genes without mutations in the CM- samples were included in the plot as they were mutated in other non CM- samples that are not displayed.
+
+Across the 17 PDAC CM- samples corresponding to all 17 patients in the study, we observed that 16/17 samples (94%) possess the KRAS mutation. The exception is PCA123B, which in had the wild type KRAS allele in the patient as shown in our WES analysis and Sanger Sequencing result (Figure \@ref(fig:wesSanger)). Of the 17 samples with the KRAS mutation, 8/17 samples exhibit G12V (47%) and 5/17 G12D (29%). The remaining mutations present only in a single sample are P34R, G12A, G12I and G12R. 76% of the CM- samples have mutations in the TP53 gene. With the exception of the G199E mutation which was shared between patient samples PCA117_B and PCA128_RT, each patient harbors a different mutation (See `TP53_CM-_mutations.csv` for the list of mutations in the CM- samples). 
+
+Other genes that were mutated in relatively high proportion include the CDKN2A (35%), SMAD4 (29%) , ARID1A (24%) and ATM (18%) mutations.
+
+```{r oncoplotCosmic, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs in the COSMIC genes for the CM- samples only."}
+knitr::include_graphics(paste0(res_path_report, "oncoplot_snps_indels/oncoplot_cosmic_snp_indel_cm-.png"))
 ```
 
-We find that the majority of mutations identified (2964) are unique to each patient, with only 1 gene shared across 15 (KRAS),  12 (TP53) and 11 (OR8U1) patients (Figure \@ref(fig:numMut)). 3 (CHIT1, MUC5AC and TTN) genes are shared across 8 patients, 3 () This suggests that the mutational landscape is highly heterogeneous, with a few conserved driver genes tshared across distinct individuals.
+Again considering only the CM- samples in our dataset, we find that the majority of mutations identified (1779) are unique to each sample, with only 1 gene shared across 15 patients (KRAS),  1 gene across 12 patients (TP53), 2 genes across 8 patients (CHIT1, OR8U1), 2 genes across 6 patients (CDKN2A, MUC19), 2 genes across 5 patients (SMAD4, LNP1) and 8 genes across 4 patients (ADGRV1, ARID1A, ATG2A, MUC5AC, PXDNL, RAI1, SOX1, TTN). This suggests that the mutational landscape is highly heterogeneous, with a few conserved driver genes shared across distinct individuals. The full list of mutations shared across multiple patients in the CM- samples can be found in `num_patients_shared_cm-.csv`. For more detailed exploration to answer questions such as "Which patients have a mutation in gene X", the full list of mutations can be further explored in `full_mutation_list.csv`. For the list of mutations shared across multiple patients in all samples, refer to `num_patients_shared.csv` and `num_gene_category.png`.
 
 ```{r numMut, include=TRUE, fig.cap="Barplots showing the number of mutations that are shared by patients"}
-knitr::include_graphics(paste0(res_path_report, "num_gene_category.png"))
+knitr::include_graphics(paste0(res_path_report, "num_gene_category_cm-.png"))
 ```
 
 ## Validation of KRAS mutations with Sanger Sequencing
@@ -157,7 +175,7 @@ WES-identified KRAS mutations are identical to the Sanger Sequencing KRAS result
 In total, 14/17 (82%) samples have identical KRAS mutations identified by both WES and Sanger sequencing. The KRAS wild-type alleles 
 in 2 samples were concordant in both sequencing methods. 
 
-To double check that this is not a false positive call due to issues with the variant caller, we examined the reads at amino acid glycine codon 12 (specifically, position 25,245,350 on chromosome 12 in grch38) and amino acid proline at codon 34 (specifically, position 25,245,284 in chromosome 12 on grch38) in the KRAS gene in the integrated genome viewer (IGV) as these correspond to the discrepancies between both methods. For 76B_CM-, we note that of the 64 reads mapped to the site, around 59% show a transversion of G->C (see `igv_sanger_wes/76B_CM-.png`). For the other samples shown, almost all the reads at this site display the wild type allele. The reads are also mapped with high confidence. Thus, this supports the proline to arginine substitution for this sample. At codon 12, for 28RT_CM+, we find around 40% of the 108 reads indicate a C->A transition at position 25,245,350 and thus the codon GTT, supporting the G12V substitution (instead of the G12D substitution indicated by Sanger sequencing). See `igv_sanger_wes/4samples_wes.png`. Interestingly, for 71B_CM-, we found that there is a dinucleotide variation spanning from positions 25,245,350 and 25,245,351, such that all reads that carry a mutation also carry both substitutions at the same time  (see `igv_sanger_wes/dinucleotide_isoleucine.png`). Therefore, in fact, the mutation for codon 12 in 71B should be G12I (glycine to isoleucine) as the codon now reads ATT. WES mistakenly called two separate codon substitutions, as the variant caller did not consider whether nearby variants are part of the same haplotype. Thus, both the sanger and the original WES analysis did not pick up this rarer G12I substitution at first instance. This was ultimately picked up as this is the only patient whereby there are 2 separate substitutions identified at codon 12 of KRAS. In conclusion, the WES mutation calls are strongly supported by the mapped reads.
+To double check that this is not a false positive call due to issues with the variant caller, we examined the reads at amino acid glycine codon 12 (specifically, position 25,245,350 on chromosome 12 in grch38) and amino acid proline at codon 34 (specifically, position 25,245,284 in chromosome 12 on grch38) in the KRAS gene in the integrated genome viewer (IGV) as these correspond to the discrepancies between both methods. For 76B_CM-, we note that of the 64 reads mapped to the site, around 59% show a transversion of G->C (see `igv_sanger_wes/76B_CM-.png`). For the other samples shown, almost all the reads at this site display the wild type allele. The reads are also mapped with high confidence. Thus, this supports the proline to arginine substitution for this sample. At codon 12, for 28RT_CM+, we find around 40% of the 108 reads indicate a C->A transition at position 25,245,350 and thus the codon GTT, supporting the G12V substitution (instead of the G12D substitution indicated by Sanger sequencing). See `igv_sanger_wes/4samples_wes.png`. Interestingly, for 71B_CM-, we found that there is a dinucleotide variation spanning from positions 25,245,350 and 25,245,351, such that all reads that carry a mutation also carry both substitutions at the same time  (see `igv_sanger_wes/dinucleotide_isoleucine.png`). Therefore, in fact, the mutation for codon 12 in 71B should be G12I (glycine to isoleucine) as the codon now reads ATT. WES mistakenly called an additional two separate codon substitutions, on top of the G12I mutation, as the variant caller did not consider whether nearby variants are part of the same haplotype. In general, the WES mutation calls are strongly supported by the mapped reads.
 
 ```{r wesSanger, include=TRUE, fig.cap="Assessing the concordance between the KRAS mutations identified by WES and Sanger Sequencing"}
 knitr::include_graphics(paste0(res_path_report, "wes_sanger_comparison.png"))
@@ -173,30 +191,23 @@ are shared within the PDOs and if present, the tissue sample, for each patient. 
 
 ## Unsupervised clustering of PDO and patient samples
 
-We carried out an unsupervised clustering of the 7 patient tissue samples along with
-the remaining PDO samples, based on their somatic mutational profiles (Figure \@ref(fig:unsupervisedClustering)) . Specifically,
-a binary matrix was constructed based on whether a sample possesses a specific mutation
-within the full set of mutated genes, and the spearman correlation was chosen a measure of 
-dissimilarity between the samples. We found that 3 of the tissue samples clustered together
-with the corresponding PDO samples, whereas the remaining 4 of them had relatively fewer mutations and tended to
-cluster together with other samples with similarly lower TMB.
+We carried out an unsupervised clustering of the PDO samples that have a matched patient
+tissue sample, using mutations in the COSMIC genes. (Figure \@ref(fig:unsupervisedClustering)) .
+In general,  we find that the PDO samples cluster together with the patient tissue samples. For
+the full clustering heatmap including all samples with or without a matched tissue sample,
+see `unsupervised_clustering_snps_indels_shortName_COSMIC.png`. For the heatmap clustered
+using all genes, see `unsupervised_clustering_snps_indels_shortName.png`. 
 
-```{r unsupervisedClustering, include=TRUE, fig.cap="Unsupervised clustering of PDO and tissue samples"}
-knitr::include_graphics(paste0(res_path_report, "unsupervised_clustering_snps_indels_shortName.png"))
+```{r unsupervisedClustering, include=TRUE, fig.cap="Unsupervised clustering of samples with a matched patient tissue sample. Only mutations in genes present in the COSMIC database are used."}
+knitr::include_graphics(paste0(res_path_report, "unsupervised_clustering_snps_indels_shortName_COSMIC_onlyMatchedTissue.png"))
 ```
 
 ## Copy number alterations 
 
-We incorporated the CNA results into the oncoplot and display them in this report. Note that CNA results are absent from 2 patients, PCA80 and PCA35 as they did not have matched blood samples for accurate copy number profile identification with ASCAT. Two oncoplots are shown,
-one for the top 50 genes that are mutated in the PDO/TISSUE samples (Figure \@ref(fig:oncoplotCN)). Another oncoplot highlights all the COSMIC genes
-that are mutated in the samples (Figure \@ref(fig:oncoplotCNCosmic) ). The TMB score is indicated in the top panel (identical result to `tmb_pdac.png`). Further results from this analysis to explore can be found in the `ascat_cn_signatures` folder.
+We incorporated the CNA results into the oncoplot and display them in this report. Similar to the oncoplots containing only the SNPs/INDELs,  Note that CNA results are absent from 2 patients, PCA80 and PCA35 as they did not have matched blood samples for accurate copy number profile identification with ASCAT. The oncoplot for all CM- samples are shown in ((Figure \@ref(fig:oncoplotCNCosmic)). Further figures can be found in the `oncoplots_cn` folder. The TMB score is indicated in the top panel (identical to `tmb_pdac.png`). Further results from this analysis to explore can be found in the `ascat_cn_signatures` folder.
 
-```{r oncoplotCN, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs and copy number alterations in the top 50 mutated genes"}
-knitr::include_graphics(paste0(res_path_report, "oncoplot_CN.png"))
-```
-
-```{r oncoplotCNCosmic, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs and copy number alterations in the COSMIC genes"}
-knitr::include_graphics(paste0(res_path_report, "oncoplot_CN_cosmic.png"))
+```{r oncoplotCNCosmic, include=TRUE, fig.cap="Oncoplot showing the SNPs/INDELs and copy number alterations in the COSMIC genes for the CM- samples"}
+knitr::include_graphics(paste0(res_path_report, "oncoplots_cn/oncoplot_cn_cm-.png"))
 ```
 
 ## KRAS copy number alterations, grouped by condition

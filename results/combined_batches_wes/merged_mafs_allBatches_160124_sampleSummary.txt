@@ -1,7 +1,7 @@
 Tumor_Sample_Barcode	Frame_Shift_Del	Frame_Shift_Ins	In_Frame_Del	In_Frame_Ins	Missense_Mutation	Nonsense_Mutation	Nonstop_Mutation	Splice_Site	Translation_Start_Site	total
 PCA80_80B_CM+	14	7	32	33	391	11	2	10	1	501
 PCA35_35B_CM-	18	5	30	41	385	8	2	10	1	500
-PCA117_117B_CM-	12	5	14	14	433	13	0	5	0	496
+PCA117_117B_CM-	12	5	13	13	434	13	0	5	0	495
 PCA128_128RT_CM+	4	2	0	0	155	11	0	4	0	176
 PCA81_81B_T2	4	5	2	0	139	7	0	6	0	163
 PCA128_128RT_CM-	6	2	0	0	136	7	0	2	1	154
