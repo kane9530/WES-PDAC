@@ -6,6 +6,9 @@ Bailey et al. 2016 DOI: 10.1038/nature16965
 TCGA 2017 doi: 10.1016/j.ccell.2017.07.007
 Tiriac doi:0.1158/2159-8290.CD-18-0349
 
+# Genes of interest
+TP53, KRAS, CDNK2A, SMAD4.
+
 # RNAseq analysis request (from Claire)
 
 So the intention for the RNA-seq analysis was 1. as a confirmation that our cohort is representative of the PDAC molecular landscape and 2. some of these classifications have described drug sensitivity associated with certain subtypes, so wanted to see if that was true in our dataset as well. 3. One of the limitations of the classifications is that because they were performed as bulk RNA-seq on tissue, there is some discussion on whether some of the subtypes exist because of immune cell and normal tissue contamination of the tumour samples, and hence are not ‘true’ tumour subtypes. So also was curious as to how our pure tumour organoids would be classified by these measures 
