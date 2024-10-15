@@ -1,10 +1,6 @@
-# wes-pdac-claire
+# Whole exome sequencing of PDAC samples
 
-- [wes-pdac-claire](#wes-pdac-claire)
-- [Raw data](#raw-data)
-- [Directory organisation](#directory-organisation)
-- [Input files](#input-files)
-- [Method summary](#method-summary)
+In this project, I analysed 50 tumor and normal WES samples for an experimentalist collaborator at NUS. I executed the Nf-core sarek nextflow pipeline, wrote custom bash scripts to tidy up the variant calling results, and ran downstream analysis and visualisation of the mutation variants in MAF file format in R. Results are stored in the `results/` folder. The project writeup is stored in `analysis/results_discussion.pdf`.
 
 # Raw data
 - WES Batch 1 : s3://claire-booney-052023-data
